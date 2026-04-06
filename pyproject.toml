@@ -1,0 +1,70 @@
+[project]
+name = "bioclimatic-morphology"
+version = "0.1.0"
+description = "Data-driven bioclimatic morphology: mapping animal thermoregulatory features and vernacular building strategies in psychrometric space"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    { name = "Ted Ngai" },
+]
+
+dependencies = [
+    # Core data science
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scipy>=1.12",
+    # Climate & psychrometrics
+    "earthengine-api>=1.4",
+    "cdsapi>=0.7",
+    "psychrolib>=2.5",
+    "xarray>=2024.1",
+    "netcdf4>=1.7",
+    "cfgrib>=0.9",
+    # Biodiversity data
+    "pygbif>=0.6",
+    # ML & modeling
+    "scikit-learn>=1.4",
+    "xgboost>=2.0",
+    "shap>=0.45",
+    "umap-learn>=0.5",
+    # Deep learning (embedding alignment)
+    "torch>=2.2",
+    # Visualization
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "plotly>=5.18",
+    # Notebooks
+    "jupyterlab>=4.0",
+    "ipywidgets>=8.1",
+    # Utilities
+    "tqdm>=4.66",
+    "pyyaml>=6.0",
+    "requests>=2.31",
+    "httpx>=0.27",
+    "serpapi>=1.0.2",
+    "torchvision>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.3",
+    "pytest>=8.0",
+    "pre-commit>=3.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

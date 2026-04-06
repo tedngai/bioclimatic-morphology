@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+.ruff_cache/
+*.pyc
+
+# Environment
+.env
+.cdsapirc
+*.key
+*.pem
+
+# Data (large files — re-download via scripts)
+data/**/*.nc
+data/**/*.grib
+data/**/*.csv
+!data/**/*.gitkeep
+data/**/*.zip
+data/**/*.tif
+data/**/*.npy
+data/vision/images/**
+
+# Research artifacts
+research/serpapi/
+
+# Outputs (reproducible from code)
+outputs/**/*.pt
+outputs/**/*.pkl
+outputs/**/*.json
+outputs/**/*.png
+outputs/**/*.pdf
+outputs/reports/.obsidian/
+
+# Backup (archived reference material)
+backup/
+
+# OS
+.DS_Store
+*:Zone.Identifier
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
