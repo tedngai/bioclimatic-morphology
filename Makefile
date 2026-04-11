@@ -1,4 +1,5 @@
 .PHONY: help install extract-climate seed-animals seed-buildings analyze-pilot clean
+.PHONY: inat-obs inat-images inat-all
 
 PYTHON = uv run python
 
@@ -46,6 +47,28 @@ pilot: extract-climate seed-all ## Run full pilot data extraction + seeding
 
 lab: ## Launch JupyterLab
 	uv run jupyter lab --no-browser
+
+# ── Phase 8: Vision pipeline ──────────────────────────────────────────────
+
+inat-obs: ## Download iNaturalist observation metadata (mammals+birds)
+	python3 scripts/extraction/download_inaturalist.py --taxon both --target 500000
+
+inat-obs-mammals: ## Download mammal observations only
+	python3 scripts/extraction/download_inaturalist.py --taxon mammals --target 500000
+
+inat-obs-birds: ## Download bird observations only
+	python3 scripts/extraction/download_inaturalist.py --taxon birds --target 500000
+
+inat-images: ## Download iNaturalist images (mammals+birds)
+	python3 scripts/extraction/download_inaturalist_images.py --taxon both --max-images 500000
+
+inat-images-mammals: ## Download mammal images only
+	python3 scripts/extraction/download_inaturalist_images.py --taxon mammals --max-images 500000
+
+inat-images-birds: ## Download bird images only
+	python3 scripts/extraction/download_inaturalist_images.py --taxon birds --max-images 500000
+
+inat-all: inat-obs inat-images ## Run full iNaturalist pipeline (obs + images)
 
 # ── Utilities ──────────────────────────────────────────────────────────────
 
