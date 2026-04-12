@@ -1,0 +1,253 @@
+mammals: have 7400 observations, targeting 500000
+  Resuming from id_above=248107
+  Page 10: id>327899 | +200 new | total 9400/500000 | 64/s | ETA 128min | DB has 5,400,774 total
+  Page 20: id>387248 | +200 new | total 11400/500000 | 66/s | ETA 124min | DB has 5,398,774 total
+  Page 30: id>449967 | +200 new | total 13400/500000 | 66/s | ETA 123min | DB has 5,396,775 total
+  Page 40: id>505842 | +200 new | total 15400/500000 | 67/s | ETA 121min | DB has 5,394,775 total
+  Page 50: id>566301 | +200 new | total 17400/500000 | 67/s | ETA 120min | DB has 5,392,775 total
+  Page 60: id>653816 | +200 new | total 19400/500000 | 66/s | ETA 121min | DB has 5,390,776 total
+  Page 70: id>757233 | +200 new | total 21400/500000 | 67/s | ETA 120min | DB has 5,388,776 total
+  Page 80: id>845950 | +200 new | total 23400/500000 | 66/s | ETA 120min | DB has 5,386,776 total
+  Page 90: id>969944 | +200 new | total 25400/500000 | 66/s | ETA 119min | DB has 5,384,776 total
+  Page 100: id>1084293 | +200 new | total 27400/500000 | 66/s | ETA 119min | DB has 5,382,777 total
+  [checkpoint] 27400 observations saved to observations_mammals.csv
+  Page 110: id>1177285 | +200 new | total 29400/500000 | 66/s | ETA 119min | DB has 5,380,782 total
+  Page 120: id>1256693 | +200 new | total 31400/500000 | 66/s | ETA 119min | DB has 5,378,785 total
+  Page 130: id>1373725 | +200 new | total 33400/500000 | 66/s | ETA 119min | DB has 5,376,786 total
+  Page 140: id>1477630 | +200 new | total 35400/500000 | 65/s | ETA 118min | DB has 5,374,788 total
+  Page 150: id>1594152 | +200 new | total 37400/500000 | 65/s | ETA 118min | DB has 5,372,790 total
+  Page 160: id>1720262 | +200 new | total 39400/500000 | 65/s | ETA 118min | DB has 5,370,790 total
+  Page 170: id>1830287 | +200 new | total 41400/500000 | 65/s | ETA 117min | DB has 5,368,790 total
+  Page 180: id>1917652 | +200 new | total 43400/500000 | 65/s | ETA 117min | DB has 5,366,790 total
+  Page 190: id>2068303 | +200 new | total 45400/500000 | 65/s | ETA 116min | DB has 5,364,790 total
+  Page 200: id>2347077 | +200 new | total 47400/500000 | 65/s | ETA 116min | DB has 5,362,790 total
+  [checkpoint] 47400 observations saved to observations_mammals.csv
+  Page 210: id>2445970 | +200 new | total 49400/500000 | 65/s | ETA 115min | DB has 5,360,791 total
+  Page 220: id>2550220 | +200 new | total 51400/500000 | 65/s | ETA 115min | DB has 5,358,792 total
+  Page 230: id>2635098 | +200 new | total 53400/500000 | 65/s | ETA 114min | DB has 5,356,793 total
+  Page 240: id>2712719 | +200 new | total 55400/500000 | 65/s | ETA 114min | DB has 5,354,795 total
+  Page 250: id>2794881 | +200 new | total 57400/500000 | 65/s | ETA 114min | DB has 5,352,797 total
+  Page 260: id>2891392 | +200 new | total 59400/500000 | 65/s | ETA 113min | DB has 5,350,799 total
+  Page 270: id>3017943 | +200 new | total 61400/500000 | 65/s | ETA 112min | DB has 5,348,801 total
+  Page 280: id>3144718 | +200 new | total 63400/500000 | 65/s | ETA 112min | DB has 5,346,803 total
+  Page 290: id>3291630 | +200 new | total 65400/500000 | 65/s | ETA 111min | DB has 5,344,805 total
+  Page 300: id>3424877 | +200 new | total 67400/500000 | 65/s | ETA 110min | DB has 5,342,806 total
+  [checkpoint] 67400 observations saved to observations_mammals.csv
+  Page 310: id>3531236 | +200 new | total 69400/500000 | 65/s | ETA 110min | DB has 5,340,806 total
+  Page 320: id>3674210 | +200 new | total 71400/500000 | 65/s | ETA 109min | DB has 5,338,806 total
+  Page 330: id>3766109 | +200 new | total 73400/500000 | 65/s | ETA 109min | DB has 5,336,806 total
+  Page 340: id>3851288 | +200 new | total 75400/500000 | 65/s | ETA 108min | DB has 5,334,806 total
+  Page 350: id>3944708 | +200 new | total 77400/500000 | 65/s | ETA 108min | DB has 5,332,806 total
+  Page 360: id>4028380 | +200 new | total 79400/500000 | 65/s | ETA 107min | DB has 5,330,807 total
+  Page 370: id>4111451 | +200 new | total 81400/500000 | 65/s | ETA 107min | DB has 5,328,809 total
+  Page 380: id>4212772 | +200 new | total 83400/500000 | 65/s | ETA 106min | DB has 5,326,810 total
+  Page 390: id>4310376 | +200 new | total 85400/500000 | 65/s | ETA 106min | DB has 5,324,812 total
+  Page 400: id>4420618 | +200 new | total 87400/500000 | 65/s | ETA 105min | DB has 5,322,811 total
+  [checkpoint] 87400 observations saved to observations_mammals.csv
+  Page 410: id>4505125 | +200 new | total 89400/500000 | 65/s | ETA 105min | DB has 5,320,811 total
+  Page 420: id>4600725 | +200 new | total 91400/500000 | 65/s | ETA 104min | DB has 5,318,811 total
+  Page 430: id>4671186 | +200 new | total 93400/500000 | 65/s | ETA 104min | DB has 5,316,815 total
+  Page 440: id>4779024 | +200 new | total 95400/500000 | 65/s | ETA 103min | DB has 5,314,815 total
+  Page 450: id>4854511 | +200 new | total 97400/500000 | 65/s | ETA 103min | DB has 5,312,816 total
+  Page 460: id>4903944 | +200 new | total 99400/500000 | 65/s | ETA 102min | DB has 5,310,817 total
+  Page 470: id>4964240 | +200 new | total 101400/500000 | 65/s | ETA 101min | DB has 5,308,817 total
+  Page 480: id>5020164 | +200 new | total 103400/500000 | 65/s | ETA 101min | DB has 5,306,817 total
+  Page 490: id>5078865 | +200 new | total 105400/500000 | 65/s | ETA 100min | DB has 5,304,817 total
+  Page 500: id>5151022 | +200 new | total 107400/500000 | 65/s | ETA 100min | DB has 5,302,818 total
+  [checkpoint] 107400 observations saved to observations_mammals.csv
+  Page 510: id>5232113 | +200 new | total 109400/500000 | 65/s | ETA 99min | DB has 5,300,819 total
+  Page 520: id>5323003 | +200 new | total 111400/500000 | 66/s | ETA 99min | DB has 5,298,819 total
+  Page 530: id>5460522 | +200 new | total 113400/500000 | 65/s | ETA 98min | DB has 5,296,817 total
+  Page 540: id>5545215 | +200 new | total 115400/500000 | 65/s | ETA 98min | DB has 5,294,819 total
+  Page 550: id>5645606 | +200 new | total 117400/500000 | 65/s | ETA 97min | DB has 5,292,820 total
+  Page 560: id>5765624 | +200 new | total 119400/500000 | 66/s | ETA 97min | DB has 5,290,821 total
+  Page 570: id>5887422 | +200 new | total 121400/500000 | 66/s | ETA 96min | DB has 5,288,823 total
+  Page 580: id>5990086 | +200 new | total 123400/500000 | 66/s | ETA 96min | DB has 5,286,823 total
+  Page 590: id>6120484 | +200 new | total 125400/500000 | 66/s | ETA 95min | DB has 5,284,824 total
+  Page 600: id>6232052 | +200 new | total 127400/500000 | 66/s | ETA 95min | DB has 5,282,824 total
+  [checkpoint] 127400 observations saved to observations_mammals.csv
+  Page 610: id>6344553 | +200 new | total 129400/500000 | 66/s | ETA 94min | DB has 5,280,824 total
+  Page 620: id>6450187 | +200 new | total 131400/500000 | 66/s | ETA 94min | DB has 5,278,825 total
+  Page 630: id>6548838 | +200 new | total 133400/500000 | 66/s | ETA 93min | DB has 5,276,825 total
+  Page 640: id>6660297 | +200 new | total 135400/500000 | 66/s | ETA 93min | DB has 5,274,825 total
+  Page 650: id>6758735 | +200 new | total 137400/500000 | 66/s | ETA 92min | DB has 5,272,825 total
+  Page 660: id>6854402 | +200 new | total 139400/500000 | 66/s | ETA 92min | DB has 5,270,825 total
+  Page 670: id>6947261 | +200 new | total 141400/500000 | 66/s | ETA 91min | DB has 5,268,825 total
+  Page 680: id>7051962 | +200 new | total 143400/500000 | 66/s | ETA 91min | DB has 5,266,826 total
+  Page 690: id>7145691 | +200 new | total 145400/500000 | 66/s | ETA 90min | DB has 5,264,828 total
+  Page 700: id>7248756 | +200 new | total 147400/500000 | 66/s | ETA 90min | DB has 5,262,829 total
+  [checkpoint] 147400 observations saved to observations_mammals.csv
+  Page 710: id>7356574 | +200 new | total 149400/500000 | 66/s | ETA 89min | DB has 5,260,830 total
+  Page 720: id>7461291 | +200 new | total 151400/500000 | 66/s | ETA 89min | DB has 5,258,831 total
+  Page 730: id>7564135 | +200 new | total 153400/500000 | 66/s | ETA 88min | DB has 5,256,833 total
+  Page 740: id>7659718 | +200 new | total 155400/500000 | 66/s | ETA 88min | DB has 5,254,833 total
+  Page 750: id>7753556 | +200 new | total 157400/500000 | 66/s | ETA 87min | DB has 5,252,833 total
+  Page 760: id>7855374 | +200 new | total 159400/500000 | 66/s | ETA 87min | DB has 5,250,834 total
+  Page 770: id>7958550 | +200 new | total 161400/500000 | 66/s | ETA 86min | DB has 5,248,835 total
+  Page 780: id>8044689 | +200 new | total 163400/500000 | 65/s | ETA 86min | DB has 5,246,836 total
+  Page 790: id>8166301 | +200 new | total 165400/500000 | 65/s | ETA 85min | DB has 5,244,836 total
+  Page 800: id>8262956 | +200 new | total 167400/500000 | 65/s | ETA 85min | DB has 5,242,837 total
+  [checkpoint] 167400 observations saved to observations_mammals.csv
+  Page 810: id>8354963 | +200 new | total 169400/500000 | 65/s | ETA 84min | DB has 5,240,838 total
+  Page 820: id>8447628 | +200 new | total 171400/500000 | 65/s | ETA 84min | DB has 5,238,838 total
+  Page 830: id>8511794 | +200 new | total 173400/500000 | 65/s | ETA 83min | DB has 5,236,840 total
+  Page 840: id>8597421 | +200 new | total 175400/500000 | 65/s | ETA 83min | DB has 5,234,842 total
+  Page 850: id>8683998 | +200 new | total 177400/500000 | 65/s | ETA 82min | DB has 5,232,842 total
+  Page 860: id>8762838 | +200 new | total 179400/500000 | 65/s | ETA 82min | DB has 5,230,843 total
+  Page 870: id>8850901 | +200 new | total 181400/500000 | 65/s | ETA 81min | DB has 5,228,847 total
+  Page 880: id>8928552 | +200 new | total 183400/500000 | 65/s | ETA 81min | DB has 5,226,850 total
+  Page 890: id>9015344 | +200 new | total 185400/500000 | 65/s | ETA 80min | DB has 5,224,854 total
+  Page 900: id>9093310 | +200 new | total 187400/500000 | 65/s | ETA 80min | DB has 5,222,854 total
+  [checkpoint] 187400 observations saved to observations_mammals.csv
+  Page 910: id>9170986 | +200 new | total 189400/500000 | 65/s | ETA 79min | DB has 5,220,856 total
+  Page 920: id>9263524 | +200 new | total 191400/500000 | 65/s | ETA 79min | DB has 5,218,857 total
+  Page 930: id>9328558 | +200 new | total 193400/500000 | 65/s | ETA 78min | DB has 5,216,858 total
+  Page 940: id>9390808 | +200 new | total 195400/500000 | 65/s | ETA 78min | DB has 5,214,858 total
+  Page 950: id>9458349 | +200 new | total 197400/500000 | 65/s | ETA 77min | DB has 5,212,858 total
+  Page 960: id>9523896 | +200 new | total 199400/500000 | 65/s | ETA 77min | DB has 5,210,859 total
+  Page 970: id>9609700 | +200 new | total 201400/500000 | 65/s | ETA 76min | DB has 5,208,860 total
+  Page 980: id>9677134 | +200 new | total 203400/500000 | 65/s | ETA 76min | DB has 5,206,862 total
+  Page 990: id>9742683 | +200 new | total 205400/500000 | 65/s | ETA 75min | DB has 5,204,864 total
+  Page 1000: id>9814217 | +200 new | total 207400/500000 | 65/s | ETA 75min | DB has 5,202,864 total
+  [checkpoint] 207400 observations saved to observations_mammals.csv
+  Page 1010: id>9882756 | +200 new | total 209400/500000 | 65/s | ETA 74min | DB has 5,200,867 total
+  Page 1020: id>9951471 | +200 new | total 211400/500000 | 65/s | ETA 74min | DB has 5,198,872 total
+  Page 1030: id>10015228 | +200 new | total 213400/500000 | 65/s | ETA 73min | DB has 5,196,873 total
+  Page 1040: id>10099043 | +200 new | total 215400/500000 | 65/s | ETA 73min | DB has 5,194,874 total
+  Page 1050: id>10198118 | +200 new | total 217400/500000 | 65/s | ETA 72min | DB has 5,192,874 total
+  Page 1060: id>10282534 | +200 new | total 219400/500000 | 65/s | ETA 72min | DB has 5,190,874 total
+  Page 1070: id>10366850 | +200 new | total 221400/500000 | 65/s | ETA 71min | DB has 5,188,875 total
+  Page 1080: id>10454143 | +200 new | total 223400/500000 | 65/s | ETA 70min | DB has 5,186,876 total
+  Page 1090: id>10545431 | +200 new | total 225400/500000 | 65/s | ETA 70min | DB has 5,184,876 total
+  Page 1100: id>10638137 | +200 new | total 227400/500000 | 65/s | ETA 69min | DB has 5,182,876 total
+  [checkpoint] 227400 observations saved to observations_mammals.csv
+  Page 1110: id>10743692 | +200 new | total 229400/500000 | 65/s | ETA 69min | DB has 5,180,877 total
+  Page 1120: id>10834057 | +200 new | total 231400/500000 | 65/s | ETA 68min | DB has 5,178,878 total
+  Page 1130: id>10938577 | +200 new | total 233400/500000 | 65/s | ETA 68min | DB has 5,176,879 total
+  Page 1140: id>11031803 | +200 new | total 235400/500000 | 65/s | ETA 68min | DB has 5,174,881 total
+  Page 1150: id>11129269 | +200 new | total 237400/500000 | 65/s | ETA 67min | DB has 5,172,882 total
+  Page 1160: id>11230742 | +200 new | total 239400/500000 | 65/s | ETA 67min | DB has 5,170,882 total
+  Page 1170: id>11333935 | +200 new | total 241400/500000 | 65/s | ETA 66min | DB has 5,168,882 total
+  Page 1180: id>11434255 | +200 new | total 243400/500000 | 65/s | ETA 66min | DB has 5,166,882 total
+  Page 1190: id>11565626 | +200 new | total 245400/500000 | 65/s | ETA 65min | DB has 5,164,883 total
+  Page 1200: id>11724096 | +200 new | total 247400/500000 | 65/s | ETA 65min | DB has 5,162,884 total
+  [checkpoint] 247400 observations saved to observations_mammals.csv
+  Page 1210: id>11891702 | +200 new | total 249400/500000 | 65/s | ETA 64min | DB has 5,160,884 total
+  Page 1220: id>12040247 | +200 new | total 251400/500000 | 65/s | ETA 64min | DB has 5,158,884 total
+  Page 1230: id>12169775 | +200 new | total 253400/500000 | 65/s | ETA 63min | DB has 5,156,885 total
+  Page 1240: id>12284796 | +200 new | total 255400/500000 | 65/s | ETA 62min | DB has 5,154,887 total
+  Page 1250: id>12409334 | +200 new | total 257400/500000 | 65/s | ETA 62min | DB has 5,152,887 total
+  Page 1260: id>12527642 | +200 new | total 259400/500000 | 65/s | ETA 61min | DB has 5,150,890 total
+  Page 1270: id>12655511 | +200 new | total 261400/500000 | 65/s | ETA 61min | DB has 5,148,891 total
+  Page 1280: id>12771262 | +200 new | total 263400/500000 | 65/s | ETA 60min | DB has 5,146,892 total
+  Page 1290: id>12910239 | +200 new | total 265400/500000 | 65/s | ETA 60min | DB has 5,144,894 total
+  Page 1300: id>13024649 | +200 new | total 267400/500000 | 65/s | ETA 59min | DB has 5,142,896 total
+  [checkpoint] 267400 observations saved to observations_mammals.csv
+  Page 1310: id>13147872 | +200 new | total 269400/500000 | 65/s | ETA 59min | DB has 5,140,896 total
+  Page 1320: id>13270981 | +200 new | total 271400/500000 | 65/s | ETA 58min | DB has 5,138,897 total
+  Page 1330: id>13410048 | +200 new | total 273400/500000 | 65/s | ETA 58min | DB has 5,136,897 total
+  Page 1340: id>13537172 | +200 new | total 275400/500000 | 65/s | ETA 57min | DB has 5,134,898 total
+  Page 1350: id>13667958 | +200 new | total 277400/500000 | 65/s | ETA 57min | DB has 5,132,899 total
+  Page 1360: id>13796304 | +200 new | total 279400/500000 | 65/s | ETA 56min | DB has 5,130,899 total
+  Page 1370: id>13922960 | +200 new | total 281400/500000 | 66/s | ETA 56min | DB has 5,128,900 total
+  Page 1380: id>14049100 | +200 new | total 283400/500000 | 66/s | ETA 55min | DB has 5,126,900 total
+  Page 1390: id>14184008 | +200 new | total 285400/500000 | 66/s | ETA 55min | DB has 5,124,900 total
+  Page 1400: id>14293223 | +200 new | total 287400/500000 | 66/s | ETA 54min | DB has 5,122,902 total
+  [checkpoint] 287400 observations saved to observations_mammals.csv
+  Page 1410: id>14410113 | +200 new | total 289400/500000 | 66/s | ETA 54min | DB has 5,120,904 total
+  Page 1420: id>14539733 | +200 new | total 291400/500000 | 66/s | ETA 53min | DB has 5,118,906 total
+  Page 1430: id>14683876 | +200 new | total 293400/500000 | 66/s | ETA 52min | DB has 5,116,907 total
+  Page 1440: id>14826570 | +200 new | total 295400/500000 | 66/s | ETA 52min | DB has 5,114,908 total
+  Page 1450: id>14983610 | +200 new | total 297400/500000 | 66/s | ETA 51min | DB has 5,112,908 total
+  Page 1460: id>15101684 | +200 new | total 299400/500000 | 66/s | ETA 51min | DB has 5,110,908 total
+  Page 1470: id>15210417 | +200 new | total 301400/500000 | 66/s | ETA 50min | DB has 5,108,908 total
+  Page 1480: id>15323287 | +200 new | total 303400/500000 | 66/s | ETA 50min | DB has 5,106,908 total
+  Page 1490: id>15442905 | +200 new | total 305400/500000 | 66/s | ETA 49min | DB has 5,104,908 total
+  Page 1500: id>15687053 | +200 new | total 307400/500000 | 66/s | ETA 49min | DB has 5,102,908 total
+  [checkpoint] 307400 observations saved to observations_mammals.csv
+  Page 1510: id>15817734 | +200 new | total 309400/500000 | 66/s | ETA 48min | DB has 5,100,909 total
+  Page 1520: id>15955285 | +200 new | total 311400/500000 | 66/s | ETA 48min | DB has 5,098,910 total
+  Page 1530: id>16074812 | +200 new | total 313400/500000 | 66/s | ETA 47min | DB has 5,096,910 total
+  Page 1540: id>16175944 | +200 new | total 315400/500000 | 66/s | ETA 47min | DB has 5,094,910 total
+  Page 1550: id>16297830 | +200 new | total 317400/500000 | 66/s | ETA 46min | DB has 5,092,910 total
+  Page 1560: id>16412978 | +200 new | total 319400/500000 | 66/s | ETA 46min | DB has 5,090,910 total
+  Error (attempt 1/3): Unterminated string starting at: line 1 column 3892436 (char 3892435), retrying in 5s
+  Page 1570: id>16540208 | +200 new | total 321400/500000 | 66/s | ETA 45min | DB has 5,088,911 total
+  Page 1580: id>16655462 | +200 new | total 323400/500000 | 66/s | ETA 45min | DB has 5,086,911 total
+  Page 1590: id>16780637 | +200 new | total 325400/500000 | 66/s | ETA 44min | DB has 5,084,912 total
+  Page 1600: id>16903023 | +200 new | total 327400/500000 | 66/s | ETA 44min | DB has 5,082,912 total
+  [checkpoint] 327400 observations saved to observations_mammals.csv
+  Page 1610: id>17031107 | +200 new | total 329400/500000 | 66/s | ETA 43min | DB has 5,080,913 total
+  Page 1620: id>17151231 | +200 new | total 331400/500000 | 66/s | ETA 43min | DB has 5,078,913 total
+  Page 1630: id>17277633 | +200 new | total 333400/500000 | 66/s | ETA 42min | DB has 5,076,914 total
+  Page 1640: id>17392490 | +200 new | total 335400/500000 | 66/s | ETA 42min | DB has 5,074,914 total
+  Page 1650: id>17515942 | +200 new | total 337400/500000 | 66/s | ETA 41min | DB has 5,072,914 total
+  Page 1660: id>17625676 | +200 new | total 339400/500000 | 66/s | ETA 41min | DB has 5,070,915 total
+  Page 1670: id>17743702 | +200 new | total 341400/500000 | 66/s | ETA 40min | DB has 5,068,915 total
+  Page 1680: id>17850905 | +200 new | total 343400/500000 | 66/s | ETA 40min | DB has 5,066,916 total
+  Page 1690: id>17944544 | +200 new | total 345400/500000 | 66/s | ETA 39min | DB has 5,064,917 total
+  Page 1700: id>18043860 | +200 new | total 347400/500000 | 66/s | ETA 39min | DB has 5,062,918 total
+  [checkpoint] 347400 observations saved to observations_mammals.csv
+  Page 1710: id>18168896 | +200 new | total 349400/500000 | 66/s | ETA 38min | DB has 5,060,918 total
+  Page 1720: id>18317966 | +200 new | total 351400/500000 | 66/s | ETA 38min | DB has 5,058,919 total
+  Page 1730: id>18406988 | +200 new | total 353400/500000 | 66/s | ETA 37min | DB has 5,056,921 total
+  Page 1740: id>18497393 | +200 new | total 355400/500000 | 66/s | ETA 37min | DB has 5,054,921 total
+  Page 1750: id>18582540 | +200 new | total 357400/500000 | 66/s | ETA 36min | DB has 5,052,922 total
+  Page 1760: id>18681888 | +200 new | total 359400/500000 | 66/s | ETA 36min | DB has 5,050,923 total
+  Page 1770: id>18763587 | +200 new | total 361400/500000 | 66/s | ETA 35min | DB has 5,048,927 total
+  Page 1780: id>18851920 | +200 new | total 363400/500000 | 66/s | ETA 35min | DB has 5,046,929 total
+  Page 1790: id>18923726 | +200 new | total 365400/500000 | 66/s | ETA 34min | DB has 5,044,930 total
+  Page 1800: id>19000499 | +200 new | total 367400/500000 | 66/s | ETA 34min | DB has 5,042,930 total
+  [checkpoint] 367400 observations saved to observations_mammals.csv
+  Page 1810: id>19070355 | +200 new | total 369400/500000 | 66/s | ETA 33min | DB has 5,040,931 total
+  Page 1820: id>19152373 | +200 new | total 371400/500000 | 66/s | ETA 33min | DB has 5,038,931 total
+  Page 1830: id>19231295 | +200 new | total 373400/500000 | 66/s | ETA 32min | DB has 5,036,934 total
+  Page 1840: id>19313486 | +200 new | total 375400/500000 | 66/s | ETA 32min | DB has 5,034,934 total
+  Page 1850: id>19393954 | +200 new | total 377400/500000 | 66/s | ETA 31min | DB has 5,032,934 total
+  Page 1860: id>19481435 | +200 new | total 379400/500000 | 66/s | ETA 31min | DB has 5,030,935 total
+  Page 1870: id>19560555 | +200 new | total 381400/500000 | 66/s | ETA 30min | DB has 5,028,935 total
+  Page 1880: id>19639504 | +200 new | total 383400/500000 | 66/s | ETA 30min | DB has 5,026,935 total
+  Page 1890: id>19711871 | +200 new | total 385400/500000 | 66/s | ETA 29min | DB has 5,024,935 total
+  Page 1900: id>19799334 | +200 new | total 387400/500000 | 66/s | ETA 29min | DB has 5,022,935 total
+  [checkpoint] 387400 observations saved to observations_mammals.csv
+  Page 1910: id>19881542 | +200 new | total 389400/500000 | 66/s | ETA 28min | DB has 5,020,936 total
+  Page 1920: id>19960599 | +200 new | total 391400/500000 | 66/s | ETA 28min | DB has 5,018,936 total
+  Page 1930: id>20041546 | +200 new | total 393400/500000 | 66/s | ETA 27min | DB has 5,016,939 total
+  Page 1940: id>20147376 | +200 new | total 395400/500000 | 66/s | ETA 27min | DB has 5,014,940 total
+  Page 1950: id>20230572 | +200 new | total 397400/500000 | 66/s | ETA 26min | DB has 5,012,942 total
+  Page 1960: id>20309837 | +200 new | total 399400/500000 | 66/s | ETA 26min | DB has 5,010,942 total
+  Page 1970: id>20401457 | +200 new | total 401400/500000 | 66/s | ETA 25min | DB has 5,008,943 total
+  Page 1980: id>20469437 | +200 new | total 403400/500000 | 66/s | ETA 25min | DB has 5,006,944 total
+  Page 1990: id>20515213 | +200 new | total 405400/500000 | 66/s | ETA 24min | DB has 5,004,944 total
+  Page 2000: id>20666983 | +200 new | total 407400/500000 | 66/s | ETA 24min | DB has 5,002,944 total
+  [checkpoint] 407400 observations saved to observations_mammals.csv
+  Page 2010: id>20769740 | +200 new | total 409400/500000 | 66/s | ETA 23min | DB has 5,000,945 total
+  Page 2020: id>20849287 | +200 new | total 411400/500000 | 66/s | ETA 22min | DB has 4,998,946 total
+  Page 2030: id>20930527 | +200 new | total 413400/500000 | 66/s | ETA 22min | DB has 4,996,946 total
+  Page 2040: id>21011117 | +200 new | total 415400/500000 | 66/s | ETA 21min | DB has 4,994,947 total
+  Page 2050: id>21090965 | +200 new | total 417400/500000 | 66/s | ETA 21min | DB has 4,992,947 total
+  Page 2060: id>21184883 | +200 new | total 419400/500000 | 66/s | ETA 20min | DB has 4,990,950 total
+  Page 2070: id>21291336 | +200 new | total 421400/500000 | 66/s | ETA 20min | DB has 4,988,954 total
+  Error (attempt 1/3): HTTPSConnectionPool(host='api.inaturalist.org', port=443): Read timed out., retrying in 5s
+  Page 2080: id>21392662 | +200 new | total 423400/500000 | 65/s | ETA 20min | DB has 4,986,955 total
+  Page 2090: id>21487092 | +200 new | total 425400/500000 | 65/s | ETA 19min | DB has 4,984,955 total
+  Page 2100: id>21604607 | +200 new | total 427400/500000 | 65/s | ETA 19min | DB has 4,982,956 total
+  [checkpoint] 427400 observations saved to observations_mammals.csv
+  Page 2110: id>21698275 | +200 new | total 429400/500000 | 65/s | ETA 18min | DB has 4,980,957 total
+  Page 2120: id>21821696 | +200 new | total 431400/500000 | 65/s | ETA 18min | DB has 4,978,958 total
+  Page 2130: id>21946841 | +200 new | total 433400/500000 | 65/s | ETA 17min | DB has 4,976,958 total
+  Page 2140: id>22085123 | +200 new | total 435400/500000 | 65/s | ETA 17min | DB has 4,974,958 total
+  Page 2150: id>22214671 | +200 new | total 437400/500000 | 65/s | ETA 16min | DB has 4,972,958 total
+  Page 2160: id>22337579 | +200 new | total 439400/500000 | 65/s | ETA 16min | DB has 4,970,958 total
+  Page 2170: id>22465026 | +200 new | total 441400/500000 | 65/s | ETA 15min | DB has 4,968,960 total
+  Page 2180: id>22588715 | +200 new | total 443400/500000 | 65/s | ETA 14min | DB has 4,966,960 total
+  Page 2190: id>22715276 | +200 new | total 445400/500000 | 65/s | ETA 14min | DB has 4,964,960 total
+  Page 2200: id>22859877 | +200 new | total 447400/500000 | 65/s | ETA 13min | DB has 4,962,960 total
+  [checkpoint] 447400 observations saved to observations_mammals.csv
+  Page 2210: id>22990948 | +200 new | total 449400/500000 | 65/s | ETA 13min | DB has 4,960,961 total
+  Page 2220: id>23143522 | +200 new | total 451400/500000 | 65/s | ETA 12min | DB has 4,958,962 total
+  Page 2230: id>23366366 | +200 new | total 453400/500000 | 65/s | ETA 12min | DB has 4,956,962 total
+  Page 2240: id>23587594 | +200 new | total 455400/500000 | 65/s | ETA 11min | DB has 4,954,963 total
+  Page 2250: id>23792071 | +200 new | total 457400/500000 | 65/s | ETA 11min | DB has 4,952,964 total
+  Page 2260: id>24013510 | +200 new | total 459400/500000 | 65/s | ETA 10min | DB has 4,950,964 total
+  Page 2270: id>24215255 | +200 new | total 461400/500000 | 65/s | ETA 10min | DB has 4,948,965 total

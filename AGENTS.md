@@ -1,121 +1,85 @@
 # AGENTS.md — Context for Continuation
 
-## Current Task: Pair iNaturalist observations with climate data
+## Current Task: DINOv2 fine-tuning (task 8.3)
 
-The iNaturalist download is complete (987K images, 101GB). The next step is pairing each observation with its climate at the observation date, to create training labels for the vision encoder.
+Climate pairing is **complete**. The training dataset is ready. Next step is building a vision encoder that predicts climate features from animal photos using DINOv2.
 
 ## What's Done
 
 ### Observation Metadata
-- `data/vision/observations_mammals.csv` — 500K rows, 4173 species, lat/lon/date/photo_url
-- `data/vision/observations_birds.csv` — 500K rows, 7892 species, lat/lon/date/photo_url
+- `data/vision/observations_mammals.csv` — 500K rows, 4173 species
+- `data/vision/observations_birds.csv` — 500K rows, 7892 species
 
 ### Images
-- `data/vision/images/mammals/` — 499,441 JPEGs (56GB), 99.9% success rate
-- `data/vision/images/birds/` — 488,102 JPEGs (46GB), 97.6% success rate
-- Images are named `{observation_id}.jpg`
-- Photo URLs are medium resolution from iNaturalist (static.inaturalist.org or inaturalist-open-data.s3.amazonaws.com)
+- `data/vision/images/mammals/` — 499,441 JPEGs (56GB)
+- `data/vision/images/birds/` — 488,102 JPEGs (46GB)
+- Named `{observation_id}.jpg`
 
-### Scripts Created
-- `scripts/extraction/download_inaturalist.py` — observation metadata download (cursor-based pagination)
-- `scripts/extraction/download_inaturalist_images.py` — concurrent image download with resume
-- `scripts/extraction/pair_observations_climate.py` — **PARTIALLY BUILT**, needs completion
+### Training Dataset (COMPLETE)
+- `data/vision/train_all.csv` — **970,147 rows** (308 MB)
+- Mammals: 489,465 | Birds: 480,682 | Species: 11,913
+- 98%+ have daily climate from NASA POWER (1981-2019)
+- Per-taxon files: `data/vision/train_mammals.csv`, `data/vision/train_birds.csv`
 
-### Makefile Targets
-- `make inat-obs` — download observation metadata
-- `make inat-images` — download images
-- `make inat-all` — both
+### Climate features (columns in train_all.csv)
+| Column | Description | Mean | Range |
+|---|---|---|---|
+| temperature_2m_mean | Daily mean temp (°C) | 15.89 | -42.32 to 41.66 |
+| wbt_c | Wet-bulb temp (Stull 2011) | 12.34 | -42.75 to 29.81 |
+| vpd_kpa | Vapor pressure deficit | 0.69 | -0.08 to 7.12 |
+| diurnal_range_c | T_max - T_min | 10.22 | 0.02 to 29.35 |
+| solar_wm2 | Mean hourly solar flux | 209.58 | 0 to 430.60 |
 
-## What's Blocked
+Full column list: `observation_id, image_path, taxon, species, common_name, family, lat, lon, date_str, photo_url, photo_id, temperature_2m_mean/max/min, relative_humidity_2m_mean/max/min, dew_point_2m_mean, wind_speed_10m_mean/max, shortwave_radiation_sum, wbt_c, vpd_kpa, diurnal_range_c, solar_wm2`
 
-### Climate Pairing (task 8.1c)
-The script `scripts/extraction/pair_observations_climate.py` queries the Open-Meteo archive API for daily climate at each observation's (lat, lon, date). It hit the **hourly API rate limit** (429 error: "Hourly API request limit exceeded").
+### Scripts (data pipeline — all complete)
+- `scripts/extraction/download_inaturalist.py` — observation metadata
+- `scripts/extraction/download_inaturalist_images.py` — image download
+- `scripts/extraction/pair_observations_nasa.py` — NASA POWER daily climate
+- `scripts/extraction/pair_observations_climate.py` — DEAD (Open-Meteo)
+- `scripts/extraction/pair_observations_worldclim.py` — BACKUP (monthly normals)
 
-**The script works** — tested successfully with 5 grid cells before rate limiting.
+## What's Next: DINOv2 Fine-Tuning
 
-**Rate limit details:**
-- Open-Meteo free tier: 10,000 requests per day, hourly limit also enforced
-- After many test calls during development, the hourly limit was exceeded
-- Need to wait ~1 hour for reset, then run with conservative rate limiting
+### Goal
+Train a vision encoder (DINOv2) to predict climate features from animal photos. The hypothesis: animals photographed in different climates will teach the model to recognize bioclimatic signals in images.
 
-**Grid strategy:**
-- Observations rounded to 0.5° grid cells
-- Mammals: 15,268 unique grid cells
-- Birds: 9,298 unique grid cells  
-- Total: ~24.5K API calls needed
-- At 3s delay (20 req/min): ~20 hours for all cells
-- Each response cached as parquet for resume
+### Approach
+1. Load pretrained DINOv2 ViT-B/14 (or ViT-L/14 if GPU memory allows)
+2. Freeze or partially fine-tune the backbone
+3. Add a regression head: embedding → 5 climate targets (wbt_c, vpd_kpa, diurnal_range_c, solar_wm2, temperature_2m_mean)
+4. Train with MSE loss (or multi-task weighted loss)
+5. Evaluate: per-target R², correlation with true climate
 
-**Required daily variables from Open-Meteo:**
-- temperature_2m_max, temperature_2m_min, temperature_2m_mean
-- relative_humidity_2m_max, relative_humidity_2m_min, relative_humidity_2m_mean
-- dew_point_2m_max, dew_point_2m_min, dew_point_2m_mean
-- wind_speed_10m_max, wind_speed_10m_mean
-- shortwave_radiation_sum
-
-**Derived psychrometric features (computed in script):**
-- `wbt_c` — wet-bulb temperature via Stull (2011)
-- `vpd_kpa` — vapor pressure deficit
-- `diurnal_range_c` — daily temperature range
-- `solar_wm2` — mean hourly solar radiation
-
-**Output format (train_mammals.csv / train_birds.csv):**
-```
-observation_id, species, common_name, family, lat, lon, date_str, photo_url, photo_id,
-temperature_2m_mean, temperature_2m_max, temperature_2m_min,
-relative_humidity_2m_mean, relative_humidity_2m_max, relative_humidity_2m_min,
-dew_point_2m_mean, wind_speed_10m_mean, wind_speed_10m_max,
-shortwave_radiation_sum, wbt_c, vpd_kpa, diurnal_range_c, solar_wm2
+### Setup on GPU machine
+```bash
+git clone https://github.com/tedngai/bioclimatic-morphology.git
+cd bioclimatic-morphology
+pip install torch torchvision transformers pandas pillow tqdm
+# or: uv sync  (if pyproject.toml has deps)
 ```
 
-## How to Resume
+### Training script skeleton (to be written)
+- PyTorch Dataset: reads `train_all.csv`, loads JPEG from `data/vision/images/{taxon}/{id}.jpg`
+- Apply DINOv2 standard preprocessing (Resize 256, CenterCrop 224, normalize)
+- Train/val split: 90/10 by species (stratified, no species leakage)
+- Batch size: as large as GPU allows (start 64 for ViT-B)
+- LR: 1e-4 for head, 1e-6 for backbone (if fine-tuning)
+- Log to wandb or tensorboard
 
-1. **Wait for rate limit to reset** (check: `curl -s "https://archive-api.open-meteo.com/v1/archive?latitude=0&longitude=0&start_date=2020-01-01&end_date=2020-01-02&daily=temperature_2m_mean&timezone=UTC"` — should return data, not 429)
-
-2. **Run climate pairing:**
-   ```bash
-   cd /home/tngai/data/bioclimatic-morphology
-   python3 scripts/extraction/pair_observations_climate.py --taxon mammals
-   python3 scripts/extraction/pair_observations_climate.py --taxon birds
-   ```
-
-3. **The script is resume-safe** — caches per-grid-cell climate as parquet files in `data/vision/climate_cache/{taxon}/`. If interrupted, re-run and it skips cached cells.
-
-4. **After climate pairing completes**, the next step is:
-   - Merge train_mammals.csv + train_birds.csv into one training dataset
-   - Add image_path column (relative path to images/)
-   - Validate climate coverage and distribution
-   - Move to task 8.3 (DINOv2 fine-tuning)
-
-## Alternative Approach (if API rate limit is persistent)
-
-If the Open-Meteo API rate limit is too restrictive for 24K calls:
-
-1. **Use WorldClim monthly normals** — downloadable rasters at 1km resolution
-   - Requires `rasterio` (not currently installed: `pip install rasterio`)
-   - Gives monthly averages, not daily — still usable for self-supervised objective
-   - No API limits
-   
-2. **Coarsen grid to 2°** — reduces to ~5K cells (well under 10K/day limit)
-   - Climate labels less precise but still captures regional patterns
-   
-3. **Use ERA5 reanalysis via CDS API** — requires `.cdsapirc` credentials
-   - More complex but no rate limit concerns
-   - Script already exists in `src/climate/era5.py`
+### Key files to write
+- `scripts/training/climate_dataset.py` — PyTorch Dataset class
+- `scripts/training/train_dinov2.py` — training loop
+- `scripts/training/evaluate.py` — metrics and visualization
 
 ## Environment
+- **Data scripts:** python3 (3.13), pandas, numpy, requests, pyarrow, rasterio
+- **Training:** PyTorch + transformers (needs GPU machine)
+- **Git:** https://github.com/tedngai/bioclimatic-morphology
+- **Disk:** ~829GB free of 1TB (images are ~102GB total)
 
-- **Python:** system python3 (3.13) for data scripts; uv-managed .venv for project code
-- **Key packages:** pandas, numpy, requests, pyarrow (for parquet caching)
-- **pip install:** `python3 -m pip install pandas requests pyarrow` (system python)
-- **uv run:** `uv run python` for project modules (uses .venv)
-- **Git:** pushed to https://github.com/tedngai/bioclimatic-morphology
-- **Disk:** ~829GB free of 1TB
-
-## Key Design Decisions
-
-1. **0.5° grid cells** for climate lookup — balances precision vs API calls
-2. **Daily aggregates** not hourly — 24x fewer data points, sufficient for training
-3. **Per-cell parquet cache** — enables resume after interruption
-4. **Stull (2011) for wet-bulb** — fast empirical approximation, ±0.3°C accuracy
-5. **Observations outside 1940-2023** dropped (archive API range) — only 5 mammals affected
+## Grid / Caching Details
+- Observations rounded to 0.5° grid cells
+- Mammals: 15,271 grid cells | Birds: 9,292 cells
+- Climate cache in `data/vision/climate_cache/{taxon}/` (parquet per cell)
+- NASA POWER API: free, no key, daily 1981-present
