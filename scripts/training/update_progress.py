@@ -348,15 +348,17 @@ def update_next_actions(next_actions: ET.Element, runs: list[dict], recommended_
     for child in list(next_actions):
         next_actions.remove(child)
 
-    has_real_completed_run = any(run["kind"] == "real" and run.get("epochs_completed") for run in runs)
+    has_completed_run = any(
+        run.get("epochs_completed") and run["kind"] in ("train", "real") for run in runs
+    )
     batch_size = (recommended_profile or {}).get("batch_size", 128)
     num_workers = (recommended_profile or {}).get("num_workers", 8)
 
     action_texts = []
-    if not has_real_completed_run:
+    if not has_completed_run:
         action_texts.append(("high", "pending", f"Start the first long-running DINOv2 climate training run with batch size {batch_size} and {num_workers} workers."))
     else:
-        action_texts.append(("high", "pending", "Review the most recent real training run and decide whether to continue, resume, or branch hyperparameters."))
+        action_texts.append(("high", "pending", "Assess per-target validation R2 of completed runs and choose next experiment: morphology variants (SAM 3 segmentation) vs. scale-up (resolution/capacity)."))
     action_texts.extend(
         [
             ("high", "pending", "Monitor TensorBoard during training for loss stability and throughput."),
