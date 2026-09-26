@@ -124,6 +124,7 @@ Isolate the animal subject so the dataset can produce full-frame / bbox-crop / b
 - **Fixed:** grad-mode bug (keep the `inference_mode` context object alive; `e5d2d2e`) and mask-shape bug (squeeze singleton/channel dims to H×W; `706e94c`). Also repointed the stale `sam3` editable install from `/mnt/usb/sam3` to `/mnt/wholemilk/sam3`.
 - **Smoke test:** 2/2 detections (scores 0.95 / 0.84), valid masks.
 - **Pilot (1000 mammals):** 765 detections (76.5%), 0 errors, 4.9 img/s → 3.4 min. Score mean 0.889 / median 0.926 (min 0.504). Mask area median 7.6%, none degenerate (>0.9); masks saved at original image resolution (~4 KB each, ~4 GB for the full run).
+- **Batch sweep (256 imgs each):** bs 16/32/64 all ~5.0 img/s with identical 208/256 detections, 0 errors → throughput is GPU-bound at res 1008 and insensitive to batch size; keep the batch-8 default.
 - Previous failed run's manifest kept as `data/vision/segmented/manifest.failed-20260628.csv`.
 - **Full-run estimate:** ~970K images ÷ 4.9 img/s ≈ **55 h**; run inside `tmux`.
 
