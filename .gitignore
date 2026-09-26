@@ -23,6 +23,7 @@ data/**/*.zip
 data/**/*.tif
 data/**/*.npy
 data/vision/images/**
+data/vision/segmented/masks/
 
 # Research artifacts
 research/serpapi/
