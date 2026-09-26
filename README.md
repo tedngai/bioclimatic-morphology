@@ -29,7 +29,7 @@ Inference:
 | Labeled dataset | 425 animals + 170 buildings with thermal metrics (fine-tuning data) |
 | 4-axis ontology | Collection, Transfer, Storage, Regulation (evaluation framework) |
 | Physics metrics | U_eff (W/m²K), C_th (kJ/K/m²), D_reg (dimensionless) |
-| Vision pipeline | Implementation planned (Phase 8) |
+| Vision pipeline | DINOv2 ViT-B/14 baseline trained — val mean R² ≈ 0.42 (species-disjoint); morphology test (SAM 3) in progress |
 | Data sources identified | iNaturalist (190M), Mapillary (~2B), Open-Meteo, AlphaEarth |
 
 ## Key Finding (Phase 1-5)
@@ -65,6 +65,7 @@ bioclimatic-morphology/
 
 | Document | Purpose |
 |---|---|
+| `docs/infrastructure.md` | Two-machine setup: SSH, git workflow, server environments |
 | `docs/phase8_vision.md` | Full implementation plan for vision approach |
 | `project_scope.md` | Current status, task checklist, project evolution |
 | `research-brief.md` | Original research design |
@@ -77,6 +78,18 @@ uv sync                    # Install dependencies
 source .env                # Load API keys
 cat docs/phase8_vision.md  # Read the implementation plan
 ```
+
+## Machines & Workflow
+
+The project runs on two machines: a local **management hub** (this checkout — edit, commit, push) and a GPU server at `spark-server:/mnt/wholemilk/bioclimatic-morphology` (training, evaluation, segmentation). Git is the sync channel: commit/push here, pull on the server, run the job, then bring results back.
+
+```bash
+make remote-status   # git + GPU + disk + tmux on the GPU server
+make remote-pull     # fast-forward the server to origin/main
+ssh spark-server     # interactive shell on the GPU server
+```
+
+See [`docs/infrastructure.md`](docs/infrastructure.md) for the full runbook (SSH, server environments, GPU sharing, gotchas).
 
 ## Dependencies
 

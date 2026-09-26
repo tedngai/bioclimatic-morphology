@@ -1,5 +1,10 @@
 # Phase 8: Vision-Based Self-Supervised Bioclimatic Morphology
 
+> **Status (2026-09-26):** Original implementation plan, kept for reference. The actual
+> implementation diverged (NASA POWER instead of Open-Meteo; no AlphaEarth head yet; a
+> species-disjoint DINOv2 baseline is complete at val mean R² ≈ 0.42). Current state:
+> `AGENTS.md`. Two-machine setup: `docs/infrastructure.md`.
+
 ## Paradigm Shift
 
 Phases 1-7 treated this as a tabular ML problem: hand-code features for 595 entities, train regression/classification models. This hit a fundamental ceiling — not enough labeled data for any model to generalize.

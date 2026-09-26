@@ -1,5 +1,6 @@
 .PHONY: help install extract-climate seed-animals seed-buildings analyze-pilot clean tensorboard progress
 .PHONY: inat-obs inat-images inat-all
+.PHONY: remote-shell remote-status remote-pull
 
 PYTHON = uv run python
 TENSORBOARD_LOGDIR ?= outputs/models
@@ -96,3 +97,17 @@ clean: ## Remove generated outputs (keeps raw data)
 clean-all: clean ## Remove all generated data including pilot CSVs
 	rm -f data/pilot/*.csv
 	rm -rf data/processed/*.csv
+
+# ── GPU server (spark-server) ──────────────────────────────────────────────
+
+REMOTE_HOST ?= spark-server
+REMOTE_DIR ?= /mnt/wholemilk/bioclimatic-morphology
+
+remote-shell: ## SSH into the GPU server
+	ssh $(REMOTE_HOST)
+
+remote-status: ## Show GPU server status (git, GPU, disk, tmux)
+	ssh $(REMOTE_HOST) 'cd $(REMOTE_DIR) && echo "== git ==" && git status -sb && git log --oneline -3 && echo "== gpu ==" && nvidia-smi --query-gpu=name,memory.used,utilization.gpu --format=csv && echo "== disk ==" && df -h /mnt/wholemilk | tail -1 && echo "== tmux ==" && (tmux ls || true)'
+
+remote-pull: ## Fast-forward the GPU server to origin/main
+	ssh $(REMOTE_HOST) 'cd $(REMOTE_DIR) && git pull --ff-only'

@@ -1,8 +1,8 @@
 # Project Scope: Data-Driven Bioclimatic Morphology
 
 **Companion to:** `research-brief.md`
-**Date:** 2026-05-17
-**Status:** Phase 8 — Climate pairing complete, DINOv2 training pipeline ready, GPU profiling complete
+**Date:** 2026-09-26 (remote state re-verified)
+**Status:** Phase 8 — DINOv2 baseline complete (val mean R² ≈ 0.42); morphology test via SAM 3 segmentation in progress
 
 ---
 
@@ -71,6 +71,7 @@ Reframes the entire approach: instead of hand-coding features, learn them from m
 - `data/vision/images/birds/` — 488K JPEGs (46GB)
 - `data/vision/climate_cache/` — per-location cached climate used during pairing
 - **Total disk used:** ~127GB of 1TB available (829GB free)
+- **Also on the GPU server** (`spark-server:/mnt/wholemilk/bioclimatic-morphology`) with trained checkpoints — see `docs/infrastructure.md`
 
 ### Code (retained)
 
@@ -104,17 +105,19 @@ See `docs/phase8_vision.md` for the full implementation plan.
 - [x] 8.1b: Download iNaturalist images (~987K images, 101GB) ✅
 - [x] 8.1c: Pair observations with daily climate and build `train_all.csv` ✅
 - [ ] 8.2: Data pipeline — Mapillary buildings (500K photos paired with climate)
-- [ ] 8.3: Self-supervised pre-training (DINOv2 fine-tuned on climate prediction) — code ready, long run pending
+- [x] 8.3a: DINOv2 climate pre-training baseline (ViT-B/14, val mean R² ≈ 0.42; per-target eval complete) ✅
+- [ ] 8.3b: Morphology test — SAM 3 segmentation blocked on a grad-mode bug in `segment_sam3.py`; then retrain on crop/masked variants
 - [ ] 8.4: Fine-tuning on 595 labeled samples (encoder → thermal metrics)
 - [ ] 8.5: Evaluation, ablation, figures
 - [ ] 8.6: Manuscript revision
 
-### Current 8.3 status
+### Current 8.3 status (2026-09-26)
 
-- Current bottleneck after moving to ext4 is GPU compute, not image I/O.
-- TensorBoard now supports intra-epoch logging every N batches.
-- `make tensorboard` launches TensorBoard on `0.0.0.0:6006` by default.
-- Current recommended starting config: `batch_size=128`, `num_workers=8`.
+- Baseline DINOv2 ViT-B/14 complete: best val mean R² **0.4184** (species-disjoint split, 10 epochs).
+  Per-target R²: wbt 0.552, temp 0.537, solar 0.366, vpd 0.335, diurnal 0.303.
+- GPU compute (not image I/O) is the bottleneck; recommended config `batch_size=128`, `num_workers=8`.
+- `make tensorboard` launches TensorBoard on `0.0.0.0:6006`; `make remote-status` / `make remote-pull` manage the GPU server.
+- Scientific decision: test the morphology claim — segment the animal (SAM 3), retrain on crop/masked variants, compare to the full-frame baseline. Segmentation pilot currently blocked on a torch inference-mode bug (see `AGENTS.md`, `docs/infrastructure.md`).
 
 ---
 
