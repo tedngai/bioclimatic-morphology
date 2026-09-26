@@ -156,7 +156,11 @@ def best_mask_from_result(result: dict):
         return None
     m = masks[best]
     m = to_cpu_numpy(m)
-    mask_bool = m > 0.5
+    mask_bool = np.squeeze(m > 0.5)
+    # SAM3 masks may carry singleton/channel dims (e.g. [1, H, W]); reduce to H×W.
+    while mask_bool.ndim > 2:
+        mask_bool = mask_bool[0]
+    mask_bool = mask_bool.astype(bool)
     boxes = to_cpu_numpy(result.get("boxes", np.empty((0, 4)))).reshape(-1, 4)
     bbox = boxes[best].tolist() if boxes.shape[0] > best else [0.0, 0.0, 0.0, 0.0]
     return mask_bool, score, bbox
