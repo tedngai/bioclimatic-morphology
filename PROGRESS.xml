@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<project name="bioclimatic-morphology" updated="2026-05-17">
+<project name="bioclimatic-morphology" updated="2026-09-26">
   <summary>
     <status>active</status>
     <phase id="8" name="Vision-Based Self-Supervised Learning" />
     <currentTask id="8.3" name="DINOv2 climate pre-training" status="in_progress" />
-    <overallState>Training dataset is complete, training code is implemented, and profiling shows the pipeline is GPU-bound on the ext4 drive. Current recommended config is batch size 128 with 8 workers at about 329.1 images/sec; tracked training runs with epoch history: 7.</overallState>
+    <overallState>Training dataset is complete, training code is implemented, and profiling shows the pipeline is GPU-bound on the ext4 drive. Current recommended config is batch size 128 with 8 workers at about 329.1 images/sec; tracked training runs with epoch history: 8.</overallState>
   </summary>
   <datasets>
     <dataset id="inat-mammals" status="complete" rows="500000" images="499441" species="4173" path="data/vision/observations_mammals.csv" />
@@ -34,7 +34,7 @@
     <tensorboard enabled="true" logEveryBatches="100" host="0.0.0.0" port="6006" makeTarget="tensorboard" />
   </training>
   <nextActions>
-    <action priority="high" status="pending">Start the first long-running DINOv2 climate training run with batch size 128 and 8 workers.</action>
+    <action priority="high" status="pending">Assess per-target validation R2 of completed runs and choose next experiment: morphology variants (SAM 3 segmentation) vs. scale-up (resolution/capacity).</action>
     <action priority="high" status="pending">Monitor TensorBoard during training for loss stability and throughput.</action>
     <action priority="medium" status="pending">Test whether a larger batch size remains stable over a sustained run if GPU memory allows.</action>
     <action priority="medium" status="pending">Evaluate the strongest checkpoint and inspect validation R2 by target.</action>
@@ -68,7 +68,12 @@
     <conclusion>Current bottleneck is GPU compute rather than file I/O or dataloader starvation.</conclusion>
   </profiling>
   <trainingRuns>
-    <run name="dinov2_climate_bs128w8_backbone2e6" kind="train" status="created" path="outputs/models/dinov2_climate_bs128w8_backbone2e6" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="0" epochsConfigured="10" />
+    <run name="dinov2_climate_bs128w8_backbone2e6" kind="train" status="completed" path="outputs/models/dinov2_climate_bs128w8_backbone2e6" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="10" epochsConfigured="10">
+      <metric name="best_val_mean_r2" value="0.4184" />
+      <metric name="last_val_mean_r2" value="0.4155" />
+      <metric name="last_val_loss" value="0.6033" />
+      <metric name="last_train_loss" value="0.4517" />
+    </run>
     <run name="dinov2_climate_bs128w8_longrun" kind="train" status="completed" path="outputs/models/dinov2_climate_bs128w8_longrun" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="10" epochsConfigured="10">
       <metric name="best_val_mean_r2" value="0.412" />
       <metric name="last_val_mean_r2" value="0.4119" />
