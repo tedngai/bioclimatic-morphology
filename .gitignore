@@ -34,6 +34,7 @@ outputs/**/*.pkl
 outputs/**/*.json
 outputs/**/*.png
 outputs/**/*.pdf
+outputs/logs/segment_sam3_full.log
 outputs/reports/.obsidian/
 
 # Backup (archived reference material)
