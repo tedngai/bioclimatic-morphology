@@ -102,7 +102,8 @@ Images: mammals 56 GB + birds 46 GB. Checkpoints ~550 MB each; prune stale runs 
 - **Checkpoints store absolute paths** from the machine that wrote them. On the server, `evaluate.py` needs `--csv-path data/vision/train_all.csv` because older checkpoints reference a stale mount path.
 - **`--csv-path` / image paths are relative to the repo root** on the machine running the job.
 - **The old GitHub PAT embedded in remote URLs is dead** (401). Historical git configs may still contain it — rotate/remove anywhere it appears outside `.env`.
-- **SAM 3 pilot failure (2026-06-28).** All 1000 images failed with `forward:Expected grad to be disabled` from `sam3/perflib/fused.py`. Root cause verified on torch 2.12: `segment_sam3.py` calls `torch.inference_mode().__enter__()` on a temporary object, which is garbage-collected immediately, leaving grad enabled. Fix by wrapping model build + inference loop in a proper `with torch.inference_mode():` block (or `torch.set_grad_enabled(False)`), then rerun with `--checkpoint`.
+- **SAM 3 pilot failure (2026-06-28).** All 1000 images failed with `forward:Expected grad to be disabled` from `sam3/perflib/fused.py`. Root cause verified on torch 2.12: `segment_sam3.py` called `torch.inference_mode().__enter__()` on a temporary object, which is garbage-collected immediately, leaving grad enabled. Fixed in commit `e5d2d2e` by keeping the context object alive; masks are also reduced to H×W before saving (`706e94c`).
+- **`sam3` package stops importing after the drive move.** Its editable install pointed at the old `/mnt/usb/sam3` path. Reinstall if imports fail: `/home/tngai/miniconda3/envs/sam3/bin/pip install -e /mnt/wholemilk/sam3 --no-deps --no-build-isolation`.
 
 ## Related Docs
 

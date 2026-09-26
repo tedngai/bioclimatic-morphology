@@ -20,7 +20,7 @@ This project runs on two machines. Work from the management machine (this checko
 
 Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species-disjoint split) and per-target eval is **done**. **Decision taken: test whether the climate signal lives in animal morphology** — isolate the animal with SAM 3 and compare full-frame vs. bbox-crop vs. background-masked under the identical species-split/hparams.
 
-Immediate blocker: the SAM 3 pilot (2026-06-28, 1000 mammals) failed for every image with `forward:Expected grad to be disabled`. Root cause verified: `segment_sam3.py` calls `torch.inference_mode().__enter__()` on a temporary object that is garbage-collected immediately, so grad stays enabled. Fix by wrapping model build + inference loop in a proper `with torch.inference_mode():` block, then rerun with `--checkpoint /mnt/wholemilk/sam3/sam3.pt` (bypasses HF gating).
+Immediate blocker **resolved (2026-09-26)**: the grad-mode bug and a mask-shape bug in `segment_sam3.py` are fixed (commits `e5d2d2e`, `706e94c`), the stale `sam3` editable install was repointed to `/mnt/wholemilk/sam3`, and the 1000-image pilot now passes: **765/1000 detections (76.5%), 0 errors, 4.9 img/s, 3.4 min**. Next: launch the full ~970K run (~55 h at pilot throughput; ~4 GB of masks), then retrain on crop/masked variants.
 
 ## What's Done
 
@@ -102,7 +102,7 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 ### Order of operations
 1. ~~Per-target eval~~ — done 2026-06-21.
 2. ~~Decide claim~~ — decided: run the morphology test.
-3. **Segmentation (in progress, blocked):** fix the grad-mode bug in `scripts/segmentation/segment_sam3.py`, rerun the 1000-image pilot, verify masks, then launch the full ~970K run.
+3. **Segmentation (pilot validated 2026-09-26):** grad-mode + mask-shape bugs fixed; 1000-mammal pilot at 76.5% detection, 4.9 img/s. Launch the full ~970K run (~55 h), then build crop/masked variants.
 4. **Retrain on variants:** same DINOv2 init, same species split, same hparams; train on (a) bbox-crop and (b) background-masked; compare per-target val R² to the 0.42 full-frame baseline. Masked ≈ 0.42 → morphology carries signal; collapse → habitat.
 5. **If environment claim instead:** scale up — image_size 224 → 518, ViT-B → ViT-L/14, stronger regularization, early stopping.
 
@@ -120,10 +120,12 @@ Isolate the animal subject so the dataset can produce full-frame / bbox-crop / b
 - Env: `/home/tngai/miniconda3/envs/sam3/bin/python` (Python 3.11, torch 2.12.0+cu130, `numpy<2`). Separate from `bm-venv` because SAM 3 needs numpy 1.26.
 - HF gating: `facebook/sam3` is gated and the cached token is unauthorized (401). **Use `--checkpoint /mnt/wholemilk/sam3/sam3.pt`** — no HF access needed.
 
-### Status (2026-06-28)
-- Pilot of 1000 mammals ran; **all rows failed**: `forward:Expected grad to be disabled` (raised by `sam3/perflib/fused.py:addmm_act`).
-- Verified root cause on torch 2.12: `torch.inference_mode().__enter__()` on a temporary object does not hold (object GC'd; `is_inference_mode_enabled()==False`, grad remains enabled). A kept reference or proper `with` block works.
-- Fix: wrap model build + batch loop in `with torch.inference_mode():` (or call `torch.set_grad_enabled(False)` once). Smoke-test with `--limit 2`, then rerun the pilot.
+### Status (2026-09-26) — pilot validated
+- **Fixed:** grad-mode bug (keep the `inference_mode` context object alive; `e5d2d2e`) and mask-shape bug (squeeze singleton/channel dims to H×W; `706e94c`). Also repointed the stale `sam3` editable install from `/mnt/usb/sam3` to `/mnt/wholemilk/sam3`.
+- **Smoke test:** 2/2 detections (scores 0.95 / 0.84), valid masks.
+- **Pilot (1000 mammals):** 765 detections (76.5%), 0 errors, 4.9 img/s → 3.4 min. Score mean 0.889 / median 0.926 (min 0.504). Mask area median 7.6%, none degenerate (>0.9); masks saved at original image resolution (~4 KB each, ~4 GB for the full run).
+- Previous failed run's manifest kept as `data/vision/segmented/manifest.failed-20260628.csv`.
+- **Full-run estimate:** ~970K images ÷ 4.9 img/s ≈ **55 h**; run inside `tmux`.
 
 ### Run commands (from the server repo root)
 ```bash
