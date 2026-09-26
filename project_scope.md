@@ -1,8 +1,8 @@
 # Project Scope: Data-Driven Bioclimatic Morphology
 
 **Companion to:** `research-brief.md`
-**Date:** 2026-04-11
-**Status:** Phase 8 — Data download complete, climate pairing in progress
+**Date:** 2026-05-17
+**Status:** Phase 8 — Climate pairing complete, DINOv2 training pipeline ready, GPU profiling complete
 
 ---
 
@@ -60,7 +60,7 @@ Reframes the entire approach: instead of hand-coding features, learn them from m
 |---|---|---|
 | iNaturalist mammals | 500K obs, 499K images (56GB), 4173 species | **DONE** |
 | iNaturalist birds | 500K obs, 488K images (46GB), 7892 species | **DONE** |
-| Open-Meteo climate pairing | 24K unique 0.5° grid cells | **IN PROGRESS** — API rate limited |
+| NASA POWER daily climate pairing | 970,147 paired image-climate rows | **DONE** |
 | Mapillary (building facades) | ~2B photos geotagged | Not yet accessed |
 | AlphaEarth per-image | GEE API, unlimited | Pipeline ready (src/climate/alphaearth.py) |
 
@@ -69,7 +69,7 @@ Reframes the entire approach: instead of hand-coding features, learn them from m
 - `data/vision/observations_birds.csv` — 500K rows (77MB)
 - `data/vision/images/mammals/` — 499K JPEGs (56GB)
 - `data/vision/images/birds/` — 488K JPEGs (46GB)
-- `data/vision/climate_cache/` — per-location cached climate (empty, waiting for API)
+- `data/vision/climate_cache/` — per-location cached climate used during pairing
 - **Total disk used:** ~127GB of 1TB available (829GB free)
 
 ### Code (retained)
@@ -81,6 +81,10 @@ Reframes the entire approach: instead of hand-coding features, learn them from m
 | `src/climate/alphaearth.py` | GEE AlphaEarth extraction | Production-ready |
 | `src/animals/schema.py` | Feature schema + validation | Reference for fine-tuning labels |
 | `src/buildings/schema.py` | Feature schema + validation | Reference for fine-tuning labels |
+| `scripts/training/climate_dataset.py` | Dataset, splits, transforms | Ready |
+| `scripts/training/train_dinov2.py` | DINOv2 climate training loop | Ready |
+| `scripts/training/evaluate.py` | Checkpoint evaluation | Ready |
+| `scripts/training/profile_dinov2.py` | Dataloader/GPU bottleneck profiling | Ready |
 
 ### Key Findings (preserved)
 
@@ -98,12 +102,19 @@ See `docs/phase8_vision.md` for the full implementation plan.
 
 - [x] 8.1a: Download iNaturalist observations (500K mammals + 500K birds) ✅
 - [x] 8.1b: Download iNaturalist images (~987K images, 101GB) ✅
-- [ ] 8.1c: **Pair observations with Open-Meteo daily climate** ← BLOCKED (rate limited)
+- [x] 8.1c: Pair observations with daily climate and build `train_all.csv` ✅
 - [ ] 8.2: Data pipeline — Mapillary buildings (500K photos paired with climate)
-- [ ] 8.3: Self-supervised pre-training (DINOv2 fine-tuned on climate prediction)
+- [ ] 8.3: Self-supervised pre-training (DINOv2 fine-tuned on climate prediction) — code ready, long run pending
 - [ ] 8.4: Fine-tuning on 595 labeled samples (encoder → thermal metrics)
 - [ ] 8.5: Evaluation, ablation, figures
 - [ ] 8.6: Manuscript revision
+
+### Current 8.3 status
+
+- Current bottleneck after moving to ext4 is GPU compute, not image I/O.
+- TensorBoard now supports intra-epoch logging every N batches.
+- `make tensorboard` launches TensorBoard on `0.0.0.0:6006` by default.
+- Current recommended starting config: `batch_size=128`, `num_workers=8`.
 
 ---
 

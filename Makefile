@@ -1,7 +1,10 @@
-.PHONY: help install extract-climate seed-animals seed-buildings analyze-pilot clean
+.PHONY: help install extract-climate seed-animals seed-buildings analyze-pilot clean tensorboard progress
 .PHONY: inat-obs inat-images inat-all
 
 PYTHON = uv run python
+TENSORBOARD_LOGDIR ?= outputs/models
+TENSORBOARD_HOST ?= 0.0.0.0
+TENSORBOARD_PORT ?= 6006
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -47,6 +50,12 @@ pilot: extract-climate seed-all ## Run full pilot data extraction + seeding
 
 lab: ## Launch JupyterLab
 	uv run jupyter lab --no-browser
+
+tensorboard: ## Launch TensorBoard on 0.0.0.0:6006
+	uv run tensorboard --logdir $(TENSORBOARD_LOGDIR) --host $(TENSORBOARD_HOST) --port $(TENSORBOARD_PORT)
+
+progress: ## Refresh PROGRESS.xml from training outputs
+	uv run python scripts/training/update_progress.py
 
 # ── Phase 8: Vision pipeline ──────────────────────────────────────────────
 

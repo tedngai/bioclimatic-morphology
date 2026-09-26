@@ -42,6 +42,9 @@ dependencies = [
     "requests>=2.31",
     "httpx>=0.27",
     "serpapi>=1.0.2",
+    "pillow>=10.0",
+    "tensorboard>=2.16",
+    "transformers>=4.41",
     "torchvision>=0.26.0",
 ]
 

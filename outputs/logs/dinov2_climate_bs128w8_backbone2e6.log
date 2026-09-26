@@ -1,0 +1,12 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 11606.46it/s]
+epoch 1/10 | train_loss=0.6541 | val_loss=0.6431 | val_mean_r2=0.3765
+epoch 2/10 | train_loss=0.5625 | val_loss=0.6160 | val_mean_r2=0.4027
+epoch 3/10 | train_loss=0.5335 | val_loss=0.6063 | val_mean_r2=0.4124
+epoch 4/10 | train_loss=0.5121 | val_loss=0.6009 | val_mean_r2=0.4176
+epoch 5/10 | train_loss=0.4948 | val_loss=0.6003 | val_mean_r2=0.4184
+epoch 6/10 | train_loss=0.4800 | val_loss=0.6014 | val_mean_r2=0.4173
+epoch 7/10 | train_loss=0.4682 | val_loss=0.6031 | val_mean_r2=0.4156
+epoch 8/10 | train_loss=0.4597 | val_loss=0.6030 | val_mean_r2=0.4158
+epoch 9/10 | train_loss=0.4541 | val_loss=0.6033 | val_mean_r2=0.4155
+epoch 10/10 | train_loss=0.4517 | val_loss=0.6033 | val_mean_r2=0.4155

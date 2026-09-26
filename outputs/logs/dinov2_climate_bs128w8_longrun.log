@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 12048.56it/s]
+epoch 1/10 | train_loss=0.6660 | val_loss=0.6513 | val_mean_r2=0.3684
+epoch 2/10 | train_loss=0.5755 | val_loss=0.6259 | val_mean_r2=0.3930
+epoch 3/10 | train_loss=0.5502 | val_loss=0.6154 | val_mean_r2=0.4033
+epoch 4/10 | train_loss=0.5331 | val_loss=0.6096 | val_mean_r2=0.4090
+epoch 5/10 | train_loss=0.5199 | val_loss=0.6074 | val_mean_r2=0.4114
+epoch 6/10 | train_loss=0.5092 | val_loss=0.6078 | val_mean_r2=0.4110
+epoch 7/10 | train_loss=0.5010 | val_loss=0.6077 | val_mean_r2=0.4110
+epoch 8/10 | train_loss=0.4952 | val_loss=0.6071 | val_mean_r2=0.4117
+epoch 9/10 | train_loss=0.4914 | val_loss=0.6068 | val_mean_r2=0.4120
+epoch 10/10 | train_loss=0.4898 | val_loss=0.6068 | val_mean_r2=0.4119

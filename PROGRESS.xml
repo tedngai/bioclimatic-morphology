@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project name="bioclimatic-morphology" updated="2026-05-17">
+  <summary>
+    <status>active</status>
+    <phase id="8" name="Vision-Based Self-Supervised Learning" />
+    <currentTask id="8.3" name="DINOv2 climate pre-training" status="in_progress" />
+    <overallState>Training dataset is complete, training code is implemented, and profiling shows the pipeline is GPU-bound on the ext4 drive. Current recommended config is batch size 128 with 8 workers at about 329.1 images/sec; tracked training runs with epoch history: 7.</overallState>
+  </summary>
+  <datasets>
+    <dataset id="inat-mammals" status="complete" rows="500000" images="499441" species="4173" path="data/vision/observations_mammals.csv" />
+    <dataset id="inat-birds" status="complete" rows="500000" images="488102" species="7892" path="data/vision/observations_birds.csv" />
+    <dataset id="train-all" status="complete" rows="970147" species="11913" path="data/vision/train_all.csv" />
+  </datasets>
+  <artifacts>
+    <artifact path="scripts/training/climate_dataset.py" status="ready" purpose="Dataset, transforms, splits, target normalization" />
+    <artifact path="scripts/training/train_dinov2.py" status="ready" purpose="DINOv2 climate training loop with checkpointing and TensorBoard logging" />
+    <artifact path="scripts/training/evaluate.py" status="ready" purpose="Checkpoint evaluation on train or validation split" />
+    <artifact path="scripts/training/profile_dinov2.py" status="ready" purpose="Benchmark dataloader wait time versus GPU compute time" />
+    <artifact path="Makefile" status="updated" purpose="TensorBoard launch target bound to 0.0.0.0" />
+    <artifact path="scripts/training/update_progress.py" status="ready" purpose="Refresh PROGRESS.xml from profile outputs and training runs" />
+  </artifacts>
+  <milestones>
+    <milestone id="8.1a" status="complete">Download iNaturalist observations</milestone>
+    <milestone id="8.1b" status="complete">Download iNaturalist images</milestone>
+    <milestone id="8.1c" status="complete">Pair observations with daily climate and build training CSVs</milestone>
+    <milestone id="8.2" status="pending">Build Mapillary climate-paired building dataset</milestone>
+    <milestone id="8.3" status="in_progress">Run sustained DINOv2 climate pre-training and collect first validation results</milestone>
+    <milestone id="8.4" status="pending">Fine-tune encoder on 595 labeled thermal samples</milestone>
+    <milestone id="8.5" status="pending">Evaluation, ablations, figures</milestone>
+    <milestone id="8.6" status="pending">Manuscript revision</milestone>
+  </milestones>
+  <training>
+    <recommendedConfig batchSize="128" numWorkers="8" model="facebook/dinov2-base" />
+    <tensorboard enabled="true" logEveryBatches="100" host="0.0.0.0" port="6006" makeTarget="tensorboard" />
+  </training>
+  <nextActions>
+    <action priority="high" status="pending">Start the first long-running DINOv2 climate training run with batch size 128 and 8 workers.</action>
+    <action priority="high" status="pending">Monitor TensorBoard during training for loss stability and throughput.</action>
+    <action priority="medium" status="pending">Test whether a larger batch size remains stable over a sustained run if GPU memory allows.</action>
+    <action priority="medium" status="pending">Evaluate the strongest checkpoint and inspect validation R2 by target.</action>
+    <action priority="medium" status="pending">Adjust unfreeze depth or learning rates after the first sustained run if validation quality stalls.</action>
+  </nextActions>
+  <commands>
+    <command name="profile">python scripts/training/profile_dinov2.py --mode all --batch-size 128 --num-workers 8</command>
+    <command name="train">python scripts/training/train_dinov2.py --batch-size 128 --num-workers 8</command>
+    <command name="tensorboard">make tensorboard TENSORBOARD_LOGDIR=outputs/models/dinov2_climate/tensorboard</command>
+    <command name="progress">python scripts/training/update_progress.py</command>
+  </commands>
+  <profiling>
+    <storageTransition from="fat32" to="ext4" impact="positive" />
+    <result name="profile_bs64_w12" status="best-loader">
+      <metric name="images_per_sec" value="6552.6472" />
+      <metric name="mean_wait_ms" value="9.767" />
+      <metric name="p95_wait_ms" value="54.7374" />
+    </result>
+    <result name="bs128_w8_mem" status="recommended-baseline">
+      <metric name="images_per_sec_end_to_end" value="329.0681" />
+      <metric name="loader_wait_pct" value="0.0231" />
+      <metric name="gpu_active_pct" value="99.9769" />
+      <metric name="peak_cuda_memory_gib" value="5.3526" />
+    </result>
+    <result name="bs160_w8_mem" status="best-throughput">
+      <metric name="images_per_sec_end_to_end" value="332.686" />
+      <metric name="loader_wait_pct" value="0.0182" />
+      <metric name="gpu_active_pct" value="99.9818" />
+      <metric name="peak_cuda_memory_gib" value="6.5228" />
+    </result>
+    <conclusion>Current bottleneck is GPU compute rather than file I/O or dataloader starvation.</conclusion>
+  </profiling>
+  <trainingRuns>
+    <run name="dinov2_climate_bs128w8_backbone2e6" kind="train" status="created" path="outputs/models/dinov2_climate_bs128w8_backbone2e6" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="0" epochsConfigured="10" />
+    <run name="dinov2_climate_bs128w8_longrun" kind="train" status="completed" path="outputs/models/dinov2_climate_bs128w8_longrun" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="10" epochsConfigured="10">
+      <metric name="best_val_mean_r2" value="0.412" />
+      <metric name="last_val_mean_r2" value="0.4119" />
+      <metric name="last_val_loss" value="0.6068" />
+      <metric name="last_train_loss" value="0.4898" />
+    </run>
+    <run name="dinov2_climate_real_opt" kind="real" status="created" path="outputs/models/dinov2_climate_real_opt" model="facebook/dinov2-base" batchSize="128" numWorkers="12" epochsCompleted="0" epochsConfigured="10" />
+    <run name="dinov2_gpu_probe_bs128w12" kind="probe" status="completed" path="outputs/models/dinov2_gpu_probe_bs128w12" model="facebook/dinov2-base" batchSize="128" numWorkers="12" epochsCompleted="1" epochsConfigured="1">
+      <metric name="best_val_mean_r2" value="-0.0449" />
+      <metric name="last_val_mean_r2" value="-0.0449" />
+      <metric name="last_val_loss" value="0.7338" />
+      <metric name="last_train_loss" value="1.0563" />
+    </run>
+    <run name="dinov2_gpu_probe_bs128w8" kind="probe" status="completed" path="outputs/models/dinov2_gpu_probe_bs128w8" model="facebook/dinov2-base" batchSize="128" numWorkers="8" epochsCompleted="1" epochsConfigured="1">
+      <metric name="best_val_mean_r2" value="-0.0449" />
+      <metric name="last_val_mean_r2" value="-0.0449" />
+      <metric name="last_val_loss" value="0.7337" />
+      <metric name="last_train_loss" value="1.0563" />
+    </run>
+    <run name="dinov2_climate_real" kind="real" status="created" path="outputs/models/dinov2_climate_real" model="facebook/dinov2-base" batchSize="32" numWorkers="4" epochsCompleted="0" epochsConfigured="10" />
+    <run name="dinov2_gpu_batch32_smoke" kind="smoke" status="completed" path="outputs/models/dinov2_gpu_batch32_smoke" model="facebook/dinov2-base" batchSize="32" numWorkers="2" epochsCompleted="1" epochsConfigured="1">
+      <metric name="best_val_mean_r2" value="-0.3862" />
+      <metric name="last_val_mean_r2" value="-0.3862" />
+      <metric name="last_val_loss" value="0.8462" />
+      <metric name="last_train_loss" value="1.0727" />
+    </run>
+    <run name="dinov2_gpu_smoke" kind="smoke" status="completed" path="outputs/models/dinov2_gpu_smoke" model="facebook/dinov2-base" batchSize="8" numWorkers="2" epochsCompleted="1" epochsConfigured="1">
+      <metric name="best_val_mean_r2" value="-0.5968" />
+      <metric name="last_val_mean_r2" value="-0.5968" />
+      <metric name="last_val_loss" value="1.0459" />
+      <metric name="last_train_loss" value="1.0439" />
+    </run>
+  </trainingRuns>
+</project>
