@@ -228,7 +228,12 @@ def main() -> int:
     dtype = {"bfloat16": torch.bfloat16, "float16": torch.float16, "float32": torch.float32}[args.dtype]
     autocast = torch.autocast("cuda", dtype=dtype) if args.device.startswith("cuda") else torch.cuda.amp.autocast(enabled=False)
     autocast.__enter__()
-    torch.inference_mode().__enter__()
+    # Keep a reference to the inference_mode context: calling __enter__() on a
+    # temporary (torch.inference_mode().__enter__()) is garbage-collected
+    # immediately and silently leaves grad enabled, which makes SAM3's fused ops
+    # raise "Expected grad to be disabled".
+    inference_mode = torch.inference_mode()
+    inference_mode.__enter__()
 
     transform = build_transform(args.resolution)
     postprocessor = PostProcessImage(
