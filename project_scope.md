@@ -108,7 +108,7 @@ See `docs/phase8_vision.md` for the full implementation plan.
 - [x] 8.3a: DINOv2 climate pre-training baseline (ViT-B/14, val mean R² ≈ 0.42; per-target eval complete) ✅
 - [x] 8.3b-pilot: SAM 3 segmentation fixed and validated (1000 mammals, 76.5% detections, 4.9 img/s) ✅
 - [x] 8.3c-seg: Full SAM 3 segmentation run complete (970,147 images, 76.7% detections, 55 h) ✅
-- [ ] 8.3c-train: Morphology test — retrain on crop/masked variants under the same species split
+- [ ] 8.3c-train: Morphology test — crop + masked retrains in progress (launched 2026-10-01, tmux `dinov2-variants`, ETA ~16 h)
 - [ ] 8.4: Fine-tuning on 595 labeled samples (encoder → thermal metrics)
 - [ ] 8.5: Evaluation, ablation, figures
 - [ ] 8.6: Manuscript revision
@@ -119,7 +119,7 @@ See `docs/phase8_vision.md` for the full implementation plan.
   Per-target R²: wbt 0.552, temp 0.537, solar 0.366, vpd 0.335, diurnal 0.303.
 - GPU compute (not image I/O) is the bottleneck; recommended config `batch_size=128`, `num_workers=8`.
 - `make tensorboard` launches TensorBoard on `0.0.0.0:6006`; `make remote-status` / `make remote-pull` manage the GPU server.
-- Scientific decision: test the morphology claim — segment the animal (SAM 3), retrain on crop/masked variants, compare to the full-frame baseline. Full segmentation complete 2026-10-01 (970,147 images, 744,528 detections / 76.7%, 55 h); variant dataset + retrain next.
+- Scientific decision: test the morphology claim — segment the animal (SAM 3), retrain on crop/masked variants, compare to the full-frame baseline. Segmentation complete 2026-10-01 (970,147 images, 744,528 detections / 76.7%, 55 h); crop + masked retrains launched 2026-10-01 (tmux `dinov2-variants`); eval next.
 
 ---
 
