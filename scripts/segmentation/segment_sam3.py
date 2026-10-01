@@ -211,7 +211,8 @@ def main() -> int:
     df = df.drop_duplicates(subset="observation_id").reset_index(drop=True)
 
     done = load_done(args.out_dir)
-    df = df[~df["observation_id"].isin(done)].reset_index(drop=True)
+    # observation_id is int64 in the source CSVs but manifest ids are strings; compare as strings
+    df = df[~df["observation_id"].astype(str).isin(done)].reset_index(drop=True)
     if args.limit:
         df = df.head(args.limit)
     print(f"[segment_sam3] {len(df)} images to process ({len(done)} already done)")

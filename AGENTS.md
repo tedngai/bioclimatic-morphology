@@ -20,7 +20,7 @@ This project runs on two machines. Work from the management machine (this checko
 
 Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species-disjoint split) and per-target eval is **done**. **Decision taken: test whether the climate signal lives in animal morphology** — isolate the animal with SAM 3 and compare full-frame vs. bbox-crop vs. background-masked under the identical species-split/hparams.
 
-Immediate blocker **resolved (2026-09-26)**: the grad-mode bug and a mask-shape bug in `segment_sam3.py` are fixed (commits `e5d2d2e`, `706e94c`), the stale `sam3` editable install was repointed to `/mnt/wholemilk/sam3`, and the 1000-image pilot now passes: **765/1000 detections (76.5%), 0 errors, 4.9 img/s, 3.4 min**. The full ~970K run is **in progress** (launched 2026-09-26, tmux `sam3-fullseg`, ETA ~54 h; resumable). Next: build crop/masked variants, then retrain.
+**Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`. Next: build full-frame / bbox-crop / background-masked variants, then retrain under the same species-disjoint split.
 
 ## What's Done
 
@@ -102,7 +102,7 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 ### Order of operations
 1. ~~Per-target eval~~ — done 2026-06-21.
 2. ~~Decide claim~~ — decided: run the morphology test.
-3. **Segmentation (full run in progress since 2026-09-26):** pilot validated; full ~970K run launched in tmux (`sam3-fullseg`, ~4.9 img/s, ETA ~54 h, resumable). Then build crop/masked variants.
+3. ~~Segmentation~~ — **done 2026-10-01**: 970,147 images, 76.7% detections, 55 h. Manifest deduplicated to one row per observation (resumability fixed via `astype(str)` on ids).
 4. **Retrain on variants:** same DINOv2 init, same species split, same hparams; train on (a) bbox-crop and (b) background-masked; compare per-target val R² to the 0.42 full-frame baseline. Masked ≈ 0.42 → morphology carries signal; collapse → habitat.
 5. **If environment claim instead:** scale up — image_size 224 → 518, ViT-B → ViT-L/14, stronger regularization, early stopping.
 
@@ -126,7 +126,8 @@ Isolate the animal subject so the dataset can produce full-frame / bbox-crop / b
 - **Pilot (1000 mammals):** 765 detections (76.5%), 0 errors, 4.9 img/s → 3.4 min. Score mean 0.889 / median 0.926 (min 0.504). Mask area median 7.6%, none degenerate (>0.9); masks saved at original image resolution (~4 KB each, ~4 GB for the full run).
 - **Batch sweep (256 imgs each):** bs 16/32/64 all ~5.0 img/s with identical 208/256 detections, 0 errors → throughput is GPU-bound at res 1008 and insensitive to batch size; keep the batch-8 default.
 - Previous failed run's manifest kept as `data/vision/segmented/manifest.failed-20260628.csv`.
-- **Full run launched 2026-09-26** in tmux session `sam3-fullseg` (log: `outputs/logs/segment_sam3_full.log`); ~970K images at ~4.9 img/s, ETA ~54 h, ~10.5 GiB GPU. Resumable: rerun the same command and obs_ids already in the manifest are skipped.
+- **Full run complete (2026-10-01):** 970,147 images in 54 h 59 m at 4.9 img/s → **744,528 detections (76.7%)**. Mammals 360,174/489,465 (73.6%); birds 384,354/480,682 (80.0%). 2 rows failed on truncated images; masks total 2.9 GB (744,528 PNGs). Manifest: one row per observation (970,147).
+- **Resumability bug found & fixed:** `observation_id` is int64 in the source CSVs while manifest ids are strings, so `load_done()` never matched and the full run reprocessed the pilot (1,000 duplicate manifest rows). Fixed with `astype(str)`; manifest deduplicated (backup on server: `/mnt/wholemilk/manifest.pre-dedupe-20261001.csv.gz`).
 
 ### Run commands (from the server repo root)
 ```bash
