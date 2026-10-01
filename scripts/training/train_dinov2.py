@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 from climate_dataset import (
     DEFAULT_CSV_PATH,
     DEFAULT_TARGET_COLUMNS,
+    IMAGE_MODES,
     SPLIT_STRATEGIES,
     ClimateImageDataset,
     TargetStats,
@@ -51,6 +52,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pin-memory", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--persistent-workers", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--image-size", type=int, default=224)
+    parser.add_argument("--image-mode", choices=IMAGE_MODES, default="full")
+    parser.add_argument("--segmentation-manifest", type=Path)
+    parser.add_argument("--crop-pad-fraction", type=float, default=0.10)
     parser.add_argument("--val-fraction", type=float, default=0.1)
     parser.add_argument("--split-strategy", choices=SPLIT_STRATEGIES, default="species")
     parser.add_argument("--seed", type=int, default=42)
@@ -434,12 +438,18 @@ def train(args: argparse.Namespace) -> None:
         target_columns,
         transform=build_image_transform(args.image_size, train=True),
         target_stats=target_stats,
+        image_mode=args.image_mode,
+        segmentation_manifest=args.segmentation_manifest,
+        crop_pad_fraction=args.crop_pad_fraction,
     )
     val_dataset = ClimateImageDataset(
         val_df,
         target_columns,
         transform=build_image_transform(args.image_size, train=False),
         target_stats=target_stats,
+        image_mode=args.image_mode,
+        segmentation_manifest=args.segmentation_manifest,
+        crop_pad_fraction=args.crop_pad_fraction,
     )
 
     train_loader = build_dataloader(
@@ -510,6 +520,11 @@ def train(args: argparse.Namespace) -> None:
         "target_stats": target_stats.to_dict(),
         "train_split": summarize_split(train_df),
         "val_split": summarize_split(val_df),
+        "image_mode": args.image_mode,
+        "detection_coverage": {
+            "train": train_dataset.detection_coverage,
+            "val": val_dataset.detection_coverage,
+        },
         "args": serialize_args(args),
     }
     save_json(args.output_dir / "run_config.json", metadata)

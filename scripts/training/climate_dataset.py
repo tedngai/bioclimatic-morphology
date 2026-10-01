@@ -30,6 +30,11 @@ DINO_MEAN = (0.485, 0.456, 0.406)
 DINO_STD = (0.229, 0.224, 0.225)
 SPLIT_STRATEGIES = ("species", "row")
 
+IMAGE_MODES = ("full", "crop", "masked")
+DEFAULT_SEGMENTATION_MANIFEST = DATA_VISION / "segmented" / "manifest.csv"
+MASKED_BACKGROUND_VALUE = 128
+MIN_CROP_PIXELS = 32.0
+
 
 @dataclass(slots=True)
 class TargetStats:
@@ -211,8 +216,124 @@ def build_image_transform(image_size: int = 224, train: bool = False) -> transfo
     return transforms.Compose(ops)
 
 
+@dataclass(slots=True)
+class SegmentationRecord:
+    """Per-observation SAM 3 output used by the crop/masked image modes."""
+
+    mask_path: Path | None
+    bbox: tuple[float, float, float, float] | None
+    has_detection: bool
+
+
+def load_segmentation_index(
+    manifest_path: str | Path,
+    observation_ids: set[int] | None = None,
+) -> dict[int, SegmentationRecord]:
+    """Load a SAM 3 manifest into an ``observation_id -> record`` index.
+
+    Rows without a detection are kept (``has_detection=False``) so callers can
+    fall back to the full frame. When ``observation_ids`` is given, only those
+    rows are read to keep memory bounded.
+    """
+
+    manifest_path = Path(manifest_path)
+    if not manifest_path.exists():
+        raise FileNotFoundError(
+            f"Segmentation manifest not found: {manifest_path}. "
+            "Run scripts/segmentation/segment_sam3.py first."
+        )
+
+    columns = [
+        "observation_id",
+        "mask_path",
+        "has_detection",
+        "bbox_x0",
+        "bbox_y0",
+        "bbox_x1",
+        "bbox_y1",
+    ]
+    manifest = pd.read_csv(manifest_path, usecols=columns)
+    if observation_ids is not None:
+        manifest = manifest[manifest["observation_id"].isin(observation_ids)]
+
+    index: dict[int, SegmentationRecord] = {}
+    for row in manifest.itertuples(index=False):
+        bbox = None
+        if bool(row.has_detection) and pd.notna(row.bbox_x0) and pd.notna(row.bbox_x1):
+            bbox = (float(row.bbox_x0), float(row.bbox_y0), float(row.bbox_x1), float(row.bbox_y1))
+        mask_path = None
+        if isinstance(row.mask_path, str) and row.mask_path:
+            mask_path = Path(row.mask_path)
+            if not mask_path.is_absolute():
+                mask_path = PROJECT_ROOT / mask_path
+        index[int(row.observation_id)] = SegmentationRecord(
+            mask_path=mask_path,
+            bbox=bbox,
+            has_detection=bool(row.has_detection),
+        )
+    return index
+
+
+def _crop_with_bbox(
+    image: Image.Image,
+    bbox: tuple[float, float, float, float],
+    pad_fraction: float = 0.10,
+    min_pixels: float = MIN_CROP_PIXELS,
+) -> Image.Image:
+    """Crop to ``bbox`` (xyxy) with padding, enforcing a minimum side length."""
+
+    width, height = image.size
+    x0, y0, x1, y1 = bbox
+    pad = pad_fraction * max(x1 - x0, y1 - y0, 1.0)
+    x0, y0, x1, y1 = x0 - pad, y0 - pad, x1 + pad, y1 + pad
+
+    if x1 - x0 < min_pixels:
+        center = (x0 + x1) / 2
+        x0, x1 = center - min_pixels / 2, center + min_pixels / 2
+    if y1 - y0 < min_pixels:
+        center = (y0 + y1) / 2
+        y0, y1 = center - min_pixels / 2, center + min_pixels / 2
+
+    x0 = max(0, int(round(x0)))
+    y0 = max(0, int(round(y0)))
+    x1 = min(width, int(round(x1)))
+    y1 = min(height, int(round(y1)))
+    if x1 <= x0 or y1 <= y0:
+        return image
+    return image.crop((x0, y0, x1, y1))
+
+
+def _apply_background_mask(
+    image: Image.Image,
+    mask_path: Path,
+    background: int = MASKED_BACKGROUND_VALUE,
+) -> Image.Image:
+    """Return the image with all non-animal pixels set to a neutral gray."""
+
+    with Image.open(mask_path) as mask_image:
+        mask = mask_image.convert("L")
+        if mask.size != image.size:
+            mask = mask.resize(image.size, resample=Image.Resampling.NEAREST)
+        mask_array = np.asarray(mask) > 127
+
+    array = np.asarray(image).copy()
+    array[~mask_array] = background
+    return Image.fromarray(array)
+
+
 class ClimateImageDataset(Dataset):
-    """Image dataset for climate regression targets."""
+    """Image dataset for climate regression targets.
+
+    ``image_mode`` selects how the animal is presented to the model:
+
+    - ``full``: the original photograph (baseline).
+    - ``crop``: bounding-box crop around the detected animal (from the SAM 3 manifest).
+    - ``masked``: non-animal pixels replaced by a neutral gray using the SAM 3 mask.
+
+    For ``crop``/``masked``, observations without a SAM 3 detection (or a missing
+    mask file) fall back to the full frame; ``detection_coverage`` reports the
+    fraction of rows that have a usable detection.
+    """
 
     def __init__(
         self,
@@ -222,12 +343,32 @@ class ClimateImageDataset(Dataset):
         image_root: str | Path = DATA_VISION,
         target_stats: TargetStats | None = None,
         max_open_attempts: int = 4,
+        image_mode: str = "full",
+        segmentation_manifest: str | Path | None = None,
+        crop_pad_fraction: float = 0.10,
     ):
+        if image_mode not in IMAGE_MODES:
+            raise ValueError(f"Unknown image_mode '{image_mode}'; expected one of {IMAGE_MODES}")
         self.df = df.reset_index(drop=True)
         self.target_columns = list(target_columns)
         self.transform = transform
         self.image_root = Path(image_root)
         self.max_open_attempts = max_open_attempts
+        self.image_mode = image_mode
+        self.crop_pad_fraction = crop_pad_fraction
+
+        self.segmentation_index: dict[int, SegmentationRecord] | None = None
+        self.detection_coverage = 1.0
+        if image_mode != "full":
+            manifest_path = Path(segmentation_manifest) if segmentation_manifest else DEFAULT_SEGMENTATION_MANIFEST
+            observation_ids = set(self.df["observation_id"].astype(int))
+            self.segmentation_index = load_segmentation_index(manifest_path, observation_ids=observation_ids)
+            detected = sum(
+                1
+                for obs_id in observation_ids
+                if (record := self.segmentation_index.get(obs_id)) is not None and record.has_detection
+            )
+            self.detection_coverage = detected / max(len(observation_ids), 1)
 
         targets = self.df[self.target_columns].to_numpy(dtype=np.float32)
         if target_stats is not None:
@@ -244,7 +385,7 @@ class ClimateImageDataset(Dataset):
             return path
         return self.image_root / path
 
-    def _load_image(self, row_index: int) -> tuple[torch.Tensor, int]:
+    def _load_image(self, row_index: int) -> tuple[Image.Image, int]:
         dataset_size = len(self.df)
         last_error: Exception | None = None
 
@@ -255,15 +396,34 @@ class ClimateImageDataset(Dataset):
             image_path = self._resolve_image_path(row["image_path"])
             try:
                 with Image.open(image_path) as image:
-                    image = image.convert("RGB")
-                    return self.transform(image), actual_index
+                    loaded = image.convert("RGB")
+                return loaded, actual_index
             except (FileNotFoundError, OSError) as exc:
                 last_error = exc
 
         raise RuntimeError(f"Unable to load image near index {row_index}") from last_error
 
+    def _apply_variant(self, image: Image.Image, row_index: int) -> tuple[Image.Image, str]:
+        """Apply the configured crop/mask variant; fall back to the full frame."""
+
+        if self.image_mode == "full" or self.segmentation_index is None:
+            return image, "full"
+
+        obs_id = int(self.df.iloc[row_index]["observation_id"])
+        record = self.segmentation_index.get(obs_id)
+        if record is None or not record.has_detection:
+            return image, "full"
+
+        if self.image_mode == "crop" and record.bbox is not None:
+            return _crop_with_bbox(image, record.bbox, pad_fraction=self.crop_pad_fraction), "crop"
+        if self.image_mode == "masked" and record.mask_path is not None and record.mask_path.exists():
+            return _apply_background_mask(image, record.mask_path), "masked"
+        return image, "full"
+
     def __getitem__(self, index: int) -> dict[str, torch.Tensor | str | int]:
-        pixel_values, actual_index = self._load_image(index)
+        image, actual_index = self._load_image(index)
+        image, variant = self._apply_variant(image, actual_index)
+        pixel_values = self.transform(image)
         row = self.df.iloc[actual_index]
         return {
             "pixel_values": pixel_values,
@@ -272,6 +432,7 @@ class ClimateImageDataset(Dataset):
             "species": str(row["species"]),
             "taxon": str(row["taxon"]),
             "image_path": str(row["image_path"]),
+            "image_variant": variant,
         }
 
 

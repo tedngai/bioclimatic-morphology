@@ -9,6 +9,7 @@ from pathlib import Path
 import torch
 
 from climate_dataset import (
+    IMAGE_MODES,
     SPLIT_STRATEGIES,
     ClimateImageDataset,
     TargetStats,
@@ -40,6 +41,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-mammals", type=int)
     parser.add_argument("--max-birds", type=int)
     parser.add_argument("--split-strategy", choices=SPLIT_STRATEGIES)
+    parser.add_argument("--image-mode", choices=IMAGE_MODES)
+    parser.add_argument("--segmentation-manifest", type=Path)
+    parser.add_argument("--crop-pad-fraction", type=float)
     parser.add_argument("--device", choices=["auto", "cuda", "cpu", "mps"], default="auto")
     parser.add_argument("--amp", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output-path", type=Path)
@@ -56,6 +60,15 @@ def main() -> int:
     target_columns = list(checkpoint["target_columns"])
     target_stats = TargetStats.from_dict(checkpoint["target_stats"])
     split_strategy = args.split_strategy or checkpoint_args.get("split_strategy", "species")
+    image_mode = args.image_mode or checkpoint_args.get("image_mode", "full")
+    crop_pad_fraction = (
+        args.crop_pad_fraction
+        if args.crop_pad_fraction is not None
+        else float(checkpoint_args.get("crop_pad_fraction", 0.10))
+    )
+    segmentation_manifest = args.segmentation_manifest
+    if segmentation_manifest is None and checkpoint_args.get("segmentation_manifest"):
+        segmentation_manifest = Path(checkpoint_args["segmentation_manifest"])
 
     full_df = load_training_dataframe(csv_path, target_columns)
     train_df, val_df = split_dataframe(
@@ -77,6 +90,9 @@ def main() -> int:
         target_columns,
         transform=build_image_transform(image_size, train=False),
         target_stats=target_stats,
+        image_mode=image_mode,
+        segmentation_manifest=segmentation_manifest,
+        crop_pad_fraction=crop_pad_fraction,
     )
     loader = build_dataloader(dataset, batch_size=batch_size, num_workers=args.num_workers, shuffle=False)
 
@@ -104,6 +120,7 @@ def main() -> int:
     payload = {
         "checkpoint": str(args.checkpoint),
         "split": args.split,
+        "image_mode": image_mode,
         "rows": len(split_df),
         "metrics": metrics,
     }
