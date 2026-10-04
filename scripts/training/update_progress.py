@@ -358,7 +358,7 @@ def update_next_actions(next_actions: ET.Element, runs: list[dict], recommended_
     if not has_completed_run:
         action_texts.append(("high", "pending", f"Start the first long-running DINOv2 climate training run with batch size {batch_size} and {num_workers} workers."))
     else:
-        action_texts.append(("high", "pending", "Assess per-target validation R2 of completed runs and choose next experiment: morphology variants (SAM 3 segmentation) vs. scale-up (resolution/capacity)."))
+        action_texts.append(("high", "pending", "Decide the next stage after the morphology-variant results: environment-claim scale-up (resolution/capacity) or further morphology controls."))
     action_texts.extend(
         [
             ("high", "pending", "Monitor TensorBoard during training for loss stability and throughput."),

@@ -1,0 +1,90 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 4905.16it/s]
+{
+  "checkpoint": "outputs/models/dinov2_climate_crop/best.pt",
+  "image_mode": "crop",
+  "metrics": {
+    "loss": 0.6538768034225326,
+    "mean_mae": 13.551259541511536,
+    "mean_r2": 0.36608448146162365,
+    "per_target": {
+      "diurnal_range_c": {
+        "mae": 3.428612470626831,
+        "mse": 18.172021865844727,
+        "pearson_r": 0.5111117655500076,
+        "r2": 0.2597771956528929
+      },
+      "solar_wm2": {
+        "mae": 54.86198806762695,
+        "mse": 4637.93408203125,
+        "pearson_r": 0.5704207531291513,
+        "r2": 0.32430031041637797
+      },
+      "temperature_2m_mean": {
+        "mae": 4.783854961395264,
+        "mse": 38.022674560546875,
+        "pearson_r": 0.6883247474496651,
+        "r2": 0.471417653774136
+      },
+      "vpd_kpa": {
+        "mae": 0.38468825817108154,
+        "mse": 0.30560463666915894,
+        "pearson_r": 0.5383599315036135,
+        "r2": 0.2868153463258166
+      },
+      "wbt_c": {
+        "mae": 4.297153949737549,
+        "mse": 30.497873306274414,
+        "pearson_r": 0.6992857827224915,
+        "r2": 0.488111901138895
+      }
+    }
+  },
+  "rows": 85595,
+  "split": "val"
+}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 10221.40it/s]
+{
+  "checkpoint": "outputs/models/dinov2_climate_masked/best.pt",
+  "image_mode": "masked",
+  "metrics": {
+    "loss": 0.7471959828606234,
+    "mean_mae": 14.429574936628342,
+    "mean_r2": 0.27489694672313403,
+    "per_target": {
+      "diurnal_range_c": {
+        "mae": 3.605397939682007,
+        "mse": 19.899415969848633,
+        "pearson_r": 0.4401106409744002,
+        "r2": 0.18941320050796995
+      },
+      "solar_wm2": {
+        "mae": 58.18558883666992,
+        "mse": 5202.671875,
+        "pearson_r": 0.4958710021290487,
+        "r2": 0.24202379365066917
+      },
+      "temperature_2m_mean": {
+        "mae": 5.245152950286865,
+        "mse": 45.87822723388672,
+        "pearson_r": 0.6062169675990076,
+        "r2": 0.3622115559990522
+      },
+      "vpd_kpa": {
+        "mae": 0.4135938584804535,
+        "mse": 0.3442198634147644,
+        "pearson_r": 0.4545268099528064,
+        "r2": 0.19669962979186617
+      },
+      "wbt_c": {
+        "mae": 4.698141098022461,
+        "mse": 36.6926383972168,
+        "pearson_r": 0.6214371555370205,
+        "r2": 0.38413655366611243
+      }
+    }
+  },
+  "rows": 85595,
+  "split": "val"
+}

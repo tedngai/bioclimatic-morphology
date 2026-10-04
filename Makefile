@@ -56,7 +56,7 @@ tensorboard: ## Launch TensorBoard on 0.0.0.0:6006
 	uv run tensorboard --logdir $(TENSORBOARD_LOGDIR) --host $(TENSORBOARD_HOST) --port $(TENSORBOARD_PORT)
 
 progress: ## Refresh PROGRESS.xml from training outputs
-	uv run python scripts/training/update_progress.py
+	uv run python scripts/training/update_progress.py --max-runs 20
 
 # ── Phase 8: Vision pipeline ──────────────────────────────────────────────
 

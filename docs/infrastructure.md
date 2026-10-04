@@ -1,6 +1,6 @@
 # Infrastructure: Two-Machine Setup
 
-*Last verified: 2026-09-26*
+*Last verified: 2026-10-04*
 
 The project runs on two machines connected over Tailscale. This machine is the **management hub**; the GPU server runs training. Use git as the sync channel.
 
@@ -91,13 +91,14 @@ A `sglang` server for an LLM (`Qwen3.8-27B`, root-owned, port 8000) runs continu
 
 | Mount | Size | Used | Free |
 |---|---|---|---|
-| `/mnt/wholemilk` (server) | 458 GB ext4 | 219 GB | 216 GB |
+| `/mnt/wholemilk` (server) | 458 GB ext4 | 225 GB | 210 GB |
 | `/` nvme (server) | 925 GB | 268 GB | 611 GB |
 
 Images: mammals 56 GB + birds 46 GB. Checkpoints ~550 MB each; prune stale runs with `rm -rf outputs/models/<run>` when needed.
 
 ## Known Gotchas
 
+- **`/mnt/wholemilk` is not auto-mounted at boot.** The external Crucial X8 SSD (`/dev/sda1`, UUID `bc0dcb40-5f8c-47f0-92d1-639e7e203a94`) can be present but unmounted after a reboot, making the repo/data disappear (observed 2026-10-04). Mount with `sudo mount /dev/sda1 /mnt/wholemilk` (or add an fstab entry with `nofail`). Check `lsblk`/`df -h` if the repo path is missing.
 - **Password auth prompts break scripts.** Use the askpass pattern above or switch to keys.
 - **Checkpoints store absolute paths** from the machine that wrote them. On the server, `evaluate.py` needs `--csv-path data/vision/train_all.csv` because older checkpoints reference a stale mount path.
 - **`--csv-path` / image paths are relative to the repo root** on the machine running the job.

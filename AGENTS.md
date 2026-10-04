@@ -20,7 +20,9 @@ This project runs on two machines. Work from the management machine (this checko
 
 Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species-disjoint split) and per-target eval is **done**. **Decision taken: test whether the climate signal lives in animal morphology** — isolate the animal with SAM 3 and compare full-frame vs. bbox-crop vs. background-masked under the identical species-split/hparams.
 
-**Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`. Next: variant training is **running** — `crop` and `masked` runs launched 2026-10-01 in tmux `dinov2-variants` (10 epochs each, same hparams as the best baseline; ETA ~16 h total).
+**Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`.
+
+**Variant runs complete (2026-10-02).** `crop` and `masked` each trained 10 epochs with the best-baseline hparams. Best val mean R²: full-frame **0.4184** → crop **0.3661** → masked **0.2749**. Animal-only morphology keeps a real signal (all 5 targets R² 0.19–0.38 on unseen species), but the background/habitat carries a large share of the full-frame signal. Results table in Training Status; next decision: environment-claim scale-up vs. further morphology controls.
 
 ## What's Done
 
@@ -93,6 +95,31 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 - All 5 targets are learned positively (R² > 0.30) on unseen species → genuine cross-species climate signal.
 - Caveat: the full-frame model mostly reads the **environment** (habitat, vegetation, sky) — hence the morphology test.
 
+### Variant results — morphology test (2026-10-02, 10 epochs each)
+
+Same species-disjoint split and hparams as `dinov2_climate_bs128w8_backbone2e6`. `crop` = bbox around the animal (10% pad); `masked` = non-animal pixels set to neutral gray (128). Rows without a SAM 3 detection (23.3%) fall back to the full frame — `detection_coverage` is 0.768 train / 0.758 val in both `run_config.json`s, which dilutes the variant differences.
+
+| Run | image mode | Best val mean R² | Best epoch | Final epoch |
+|---|---|---|---|---|
+| `dinov2_climate_bs128w8_backbone2e6` | full | 0.4184 | 5 | 0.4155 |
+| `dinov2_climate_crop` | crop | 0.3661 | 4 | 0.3573 |
+| `dinov2_climate_masked` | masked | 0.2749 | 6 | 0.2705 |
+
+Per-target val R² at each run's best epoch:
+
+| Target | full-frame | crop | masked |
+|---|---|---|---|
+| wbt_c | 0.552 | 0.488 | 0.384 |
+| temperature_2m_mean | 0.537 | 0.471 | 0.362 |
+| solar_wm2 | 0.366 | 0.324 | 0.242 |
+| vpd_kpa | 0.335 | 0.287 | 0.197 |
+| diurnal_range_c | 0.303 | 0.260 | 0.189 |
+| **mean** | **0.4184** | **0.3661** | **0.2749** |
+
+- All five targets stay clearly positive with the animal isolated → morphology carries a genuine cross-species climate signal.
+- Removing the background costs −34% mean R² (masked vs. full-frame); crop is intermediate. The full-frame model reads a large part of its signal from habitat/background.
+- History: `outputs/models/dinov2_climate_{crop,masked}/history.csv` (tracked). Checkpoints `best.pt` (~550 MB) live only on the server. Formal eval JSONs via `evaluate.py` (see image-variants section).
+
 ## Assessment & Plan
 
 ### The scientific fork
@@ -103,8 +130,8 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 1. ~~Per-target eval~~ — done 2026-06-21.
 2. ~~Decide claim~~ — decided: run the morphology test.
 3. ~~Segmentation~~ — **done 2026-10-01**: 970,147 images, 76.7% detections, 55 h. Manifest deduplicated to one row per observation (resumability fixed via `astype(str)` on ids).
-4. **Retrain on variants (in progress, launched 2026-10-01):** `crop` then `masked`, same init/split/hparams as the 0.42 baseline (`dinov2_climate_bs128w8_backbone2e6`); tmux `dinov2-variants`. Compare per-target val R². Masked ≈ 0.42 → morphology carries signal; collapse → habitat.
-5. **If environment claim instead:** scale up — image_size 224 → 518, ViT-B → ViT-L/14, stronger regularization, early stopping.
+4. ~~Retrain on variants~~ — **done 2026-10-02**: crop **0.3661** / masked **0.2749** vs. full-frame **0.4184**. Neither collapsed → morphology signal is real, but the background/habitat carries a large share (caveat: 23.3% no-detection rows fall back to full frame). See variant results table.
+5. **Next decision:** if the environment claim is chosen, scale up — image_size 224 → 518, ViT-B → ViT-L/14, stronger regularization, early stopping. If the morphology claim is chosen, add controls (e.g., apply the same crop to non-animal regions, test mask-only vs. gray-fill).
 
 ### Ceiling-raising levers (claim-independent)
 Resolution (224 vs. DINOv2 native 518), capacity (ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
@@ -151,12 +178,17 @@ Masks (~3 GB) land in `data/vision/segmented/masks/{taxon}/{obs_id}.png`.
   - `crop` — bbox around the animal from the SAM 3 manifest, 10% padding, min side 32 px.
   - `masked` — non-animal pixels set to neutral gray (128) using the SAM 3 mask.
   - Rows without a detection (23.3% of the dataset) or with a missing mask fall back to the full frame; `detection_coverage` is recorded in each run's `run_config.json`.
-- Variant runs launched 2026-10-01 in tmux `dinov2-variants`: `outputs/models/dinov2_climate_crop`, then `outputs/models/dinov2_climate_masked` (~8 h each).
+- Variant runs complete (2026-10-01/02, tmux `dinov2-variants`): `outputs/models/dinov2_climate_crop` (best ep 4, 0.3661), then `outputs/models/dinov2_climate_masked` (best ep 6, 0.2749); ~8 h each.
 - Train command:
   ```bash
   bm-venv/bin/python scripts/training/train_dinov2.py --image-mode masked \
     --output-dir outputs/models/dinov2_climate_masked \
     --batch-size 128 --num-workers 8 --backbone-lr 2e-6 --head-lr 1e-4 --epochs 10
+  ```
+- Eval command (picks up `image_mode` from the checkpoint config automatically; writes `eval_val.json` next to the checkpoint):
+  ```bash
+  bm-venv/bin/python scripts/training/evaluate.py outputs/models/dinov2_climate_masked/best.pt \
+    --split val --csv-path data/vision/train_all.csv --num-workers 8
   ```
 
 ## Server Environments
