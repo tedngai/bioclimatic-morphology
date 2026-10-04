@@ -30,7 +30,7 @@ DINO_MEAN = (0.485, 0.456, 0.406)
 DINO_STD = (0.229, 0.224, 0.225)
 SPLIT_STRATEGIES = ("species", "row")
 
-IMAGE_MODES = ("full", "crop", "masked")
+IMAGE_MODES = ("full", "crop", "masked", "bg")
 DEFAULT_SEGMENTATION_MANIFEST = DATA_VISION / "segmented" / "manifest.csv"
 MASKED_BACKGROUND_VALUE = 128
 MIN_CROP_PIXELS = 32.0
@@ -303,12 +303,13 @@ def _crop_with_bbox(
     return image.crop((x0, y0, x1, y1))
 
 
-def _apply_background_mask(
+def _apply_gray_mask(
     image: Image.Image,
     mask_path: Path,
-    background: int = MASKED_BACKGROUND_VALUE,
+    keep_animal: bool,
+    gray_value: int = MASKED_BACKGROUND_VALUE,
 ) -> Image.Image:
-    """Return the image with all non-animal pixels set to a neutral gray."""
+    """Replace either the background (``keep_animal``) or the animal with gray."""
 
     with Image.open(mask_path) as mask_image:
         mask = mask_image.convert("L")
@@ -317,7 +318,10 @@ def _apply_background_mask(
         mask_array = np.asarray(mask) > 127
 
     array = np.asarray(image).copy()
-    array[~mask_array] = background
+    if keep_animal:
+        array[~mask_array] = gray_value
+    else:
+        array[mask_array] = gray_value
     return Image.fromarray(array)
 
 
@@ -329,10 +333,13 @@ class ClimateImageDataset(Dataset):
     - ``full``: the original photograph (baseline).
     - ``crop``: bounding-box crop around the detected animal (from the SAM 3 manifest).
     - ``masked``: non-animal pixels replaced by a neutral gray using the SAM 3 mask.
+    - ``bg``: animal pixels replaced by a neutral gray (background-only control).
 
-    For ``crop``/``masked``, observations without a SAM 3 detection (or a missing
-    mask file) fall back to the full frame; ``detection_coverage`` reports the
-    fraction of rows that have a usable detection.
+    For ``crop``/``masked``/``bg``, observations without a SAM 3 detection (or a
+    missing mask file) fall back to the full frame; ``detection_coverage`` reports
+    the fraction of rows that have a usable detection. With ``only_detected=True``
+    the dataframe is filtered to rows where the variant is usable (no fallback),
+    which keeps comparisons free of full-frame dilution.
     """
 
     def __init__(
@@ -346,6 +353,7 @@ class ClimateImageDataset(Dataset):
         image_mode: str = "full",
         segmentation_manifest: str | Path | None = None,
         crop_pad_fraction: float = 0.10,
+        only_detected: bool = False,
     ):
         if image_mode not in IMAGE_MODES:
             raise ValueError(f"Unknown image_mode '{image_mode}'; expected one of {IMAGE_MODES}")
@@ -356,10 +364,11 @@ class ClimateImageDataset(Dataset):
         self.max_open_attempts = max_open_attempts
         self.image_mode = image_mode
         self.crop_pad_fraction = crop_pad_fraction
+        self.only_detected = only_detected
 
         self.segmentation_index: dict[int, SegmentationRecord] | None = None
         self.detection_coverage = 1.0
-        if image_mode != "full":
+        if image_mode != "full" or only_detected:
             manifest_path = Path(segmentation_manifest) if segmentation_manifest else DEFAULT_SEGMENTATION_MANIFEST
             observation_ids = set(self.df["observation_id"].astype(int))
             self.segmentation_index = load_segmentation_index(manifest_path, observation_ids=observation_ids)
@@ -369,6 +378,10 @@ class ClimateImageDataset(Dataset):
                 if (record := self.segmentation_index.get(obs_id)) is not None and record.has_detection
             )
             self.detection_coverage = detected / max(len(observation_ids), 1)
+
+            if only_detected:
+                keep = self.df["observation_id"].astype(int).map(self._has_usable_detection)
+                self.df = self.df[keep].reset_index(drop=True)
 
         targets = self.df[self.target_columns].to_numpy(dtype=np.float32)
         if target_stats is not None:
@@ -403,6 +416,18 @@ class ClimateImageDataset(Dataset):
 
         raise RuntimeError(f"Unable to load image near index {row_index}") from last_error
 
+    def _has_usable_detection(self, obs_id: int) -> bool:
+        """Whether the configured variant can be applied to this observation."""
+
+        if self.segmentation_index is None:
+            return False
+        record = self.segmentation_index.get(obs_id)
+        if record is None or not record.has_detection:
+            return False
+        if self.image_mode == "crop":
+            return record.bbox is not None
+        return record.mask_path is not None
+
     def _apply_variant(self, image: Image.Image, row_index: int) -> tuple[Image.Image, str]:
         """Apply the configured crop/mask variant; fall back to the full frame."""
 
@@ -416,8 +441,11 @@ class ClimateImageDataset(Dataset):
 
         if self.image_mode == "crop" and record.bbox is not None:
             return _crop_with_bbox(image, record.bbox, pad_fraction=self.crop_pad_fraction), "crop"
-        if self.image_mode == "masked" and record.mask_path is not None and record.mask_path.exists():
-            return _apply_background_mask(image, record.mask_path), "masked"
+        if record.mask_path is not None and record.mask_path.exists():
+            if self.image_mode == "masked":
+                return _apply_gray_mask(image, record.mask_path, keep_animal=True), "masked"
+            if self.image_mode == "bg":
+                return _apply_gray_mask(image, record.mask_path, keep_animal=False), "bg"
         return image, "full"
 
     def __getitem__(self, index: int) -> dict[str, torch.Tensor | str | int]:

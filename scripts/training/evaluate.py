@@ -44,6 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--image-mode", choices=IMAGE_MODES)
     parser.add_argument("--segmentation-manifest", type=Path)
     parser.add_argument("--crop-pad-fraction", type=float)
+    parser.add_argument("--only-detected", action="store_true")
     parser.add_argument("--device", choices=["auto", "cuda", "cpu", "mps"], default="auto")
     parser.add_argument("--amp", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output-path", type=Path)
@@ -93,6 +94,7 @@ def main() -> int:
         image_mode=image_mode,
         segmentation_manifest=segmentation_manifest,
         crop_pad_fraction=crop_pad_fraction,
+        only_detected=args.only_detected,
     )
     loader = build_dataloader(dataset, batch_size=batch_size, num_workers=args.num_workers, shuffle=False)
 
@@ -121,7 +123,9 @@ def main() -> int:
         "checkpoint": str(args.checkpoint),
         "split": args.split,
         "image_mode": image_mode,
+        "only_detected": bool(args.only_detected),
         "rows": len(split_df),
+        "rows_evaluated": len(dataset),
         "metrics": metrics,
     }
     output_path = args.output_path or args.checkpoint.parent / f"eval_{args.split}.json"
