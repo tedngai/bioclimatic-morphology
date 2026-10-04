@@ -8,7 +8,7 @@ The project runs on two machines connected over Tailscale. This machine is the *
 
 |  | Management (this machine) | GPU server (`spark-server`) |
 |---|---|---|
-| Hostname | `cio-tngai-m` | `promaxgb10-42ce` |
+| Hostname | `cio-tngai-m` | `promaxgb10-42ce` (LAN `192.168.1.240`) |
 | OS / arch | Ubuntu 22.04, x86_64 | Ubuntu 24.04, aarch64 |
 | GPU | RTX 2000 Ada Laptop, 8 GB | NVIDIA GB10 (Grace Blackwell), ~128 GB unified memory |
 | Driver / CUDA | 591.55 | 580.159.03 / CUDA 13.0 |
@@ -20,12 +20,15 @@ The GB10 is a unified-memory machine: `nvidia-smi` reports total/used memory as 
 
 ## SSH Access
 
-Host alias is configured in `~/.ssh/config` on this machine:
+Two aliases are configured in `~/.ssh/config` on this machine:
 
 ```bash
-ssh spark-server              # interactive (prompts for password)
+ssh spark-server              # LAN — HostName 192.168.1.240
+ssh spark-server-ts           # Tailscale — resolves via MagicDNS when Tailscale is running
 ssh spark-server 'nvidia-smi' # one-off command
 ```
+
+`make remote-*` targets use `spark-server` (LAN). If the LAN IP changes, update `HostName` in `~/.ssh/config`.
 
 Authentication is **password-based** (user `tngai`) for now. For non-interactive/scripted use, two helpers exist on the management machine:
 
@@ -98,7 +101,7 @@ Images: mammals 56 GB + birds 46 GB. Checkpoints ~550 MB each; prune stale runs 
 
 ## Known Gotchas
 
-- **`/mnt/wholemilk` is not auto-mounted at boot.** The external Crucial X8 SSD (`/dev/sda1`, UUID `bc0dcb40-5f8c-47f0-92d1-639e7e203a94`) can be present but unmounted after a reboot, making the repo/data disappear (observed 2026-10-04). Mount with `sudo mount /dev/sda1 /mnt/wholemilk` (or add an fstab entry with `nofail`). Check `lsblk`/`df -h` if the repo path is missing.
+- **`/mnt/wholemilk` is fstab-managed (added 2026-10-04).** The external Crucial X8 SSD (`/dev/sda1`, UUID `bc0dcb40-5f8c-47f0-92d1-639e7e203a94`) now mounts at boot via `/etc/fstab` (`defaults,nofail,x-systemd.device-timeout=15s`). Before that it could be present but unmounted after a reboot, making the repo/data vanish (observed 2026-10-04 after the server rebooted). If it's ever missing, check `lsblk`/`df -h`, then `sudo mount /mnt/wholemilk`.
 - **Password auth prompts break scripts.** Use the askpass pattern above or switch to keys.
 - **Checkpoints store absolute paths** from the machine that wrote them. On the server, `evaluate.py` needs `--csv-path data/vision/train_all.csv` because older checkpoints reference a stale mount path.
 - **`--csv-path` / image paths are relative to the repo root** on the machine running the job.
