@@ -1,0 +1,139 @@
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 6842.16it/s]
+{
+  "checkpoint": "outputs/models/dinov2_climate_bs128w8_backbone2e6/best.pt",
+  "image_mode": "full",
+  "metrics": {
+    "loss": 0.5937383179014005,
+    "mean_mae": 12.911954021453857,
+    "mean_r2": 0.42407272530100154,
+    "per_target": {
+      "diurnal_range_c": {
+        "mae": 3.27960467338562,
+        "mse": 16.89328956604004,
+        "pearson_r": 0.5573949342122454,
+        "r2": 0.30200611057493276
+      },
+      "solar_wm2": {
+        "mae": 52.47987747192383,
+        "mse": 4297.2265625,
+        "pearson_r": 0.6173999913129063,
+        "r2": 0.37959046828315646
+      },
+      "temperature_2m_mean": {
+        "mae": 4.4478325843811035,
+        "mse": 33.183109283447266,
+        "pearson_r": 0.736166184244025,
+        "r2": 0.5400851197797051
+      },
+      "vpd_kpa": {
+        "mae": 0.36514997482299805,
+        "mse": 0.2813897430896759,
+        "pearson_r": 0.5908596898471042,
+        "r2": 0.3441620023926122
+      },
+      "wbt_c": {
+        "mae": 3.9873054027557373,
+        "mse": 26.46984100341797,
+        "pearson_r": 0.7452134684634111,
+        "r2": 0.5545199254746012
+      }
+    }
+  },
+  "only_detected": true,
+  "rows": 85595,
+  "rows_evaluated": 64848,
+  "split": "val"
+}
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 5443.41it/s]
+{
+  "checkpoint": "outputs/models/dinov2_climate_crop/best.pt",
+  "image_mode": "crop",
+  "metrics": {
+    "loss": 0.6610118804406214,
+    "mean_mae": 13.5973391354084,
+    "mean_r2": 0.3583300427994677,
+    "per_target": {
+      "diurnal_range_c": {
+        "mae": 3.4342539310455322,
+        "mse": 18.233034133911133,
+        "pearson_r": 0.5004359399859242,
+        "r2": 0.24665078785830263
+      },
+      "solar_wm2": {
+        "mae": 54.97380447387695,
+        "mse": 4653.34033203125,
+        "pearson_r": 0.5740823807190807,
+        "r2": 0.3281767960524413
+      },
+      "temperature_2m_mean": {
+        "mae": 4.849069595336914,
+        "mse": 39.11882781982422,
+        "pearson_r": 0.6788878177880746,
+        "r2": 0.4578165940824591
+      },
+      "vpd_kpa": {
+        "mae": 0.38397660851478577,
+        "mse": 0.30656367540359497,
+        "pearson_r": 0.5370995080337826,
+        "r2": 0.28548888148539076
+      },
+      "wbt_c": {
+        "mae": 4.345591068267822,
+        "mse": 31.28291893005371,
+        "pearson_r": 0.6890429314397238,
+        "r2": 0.47351715451874465
+      }
+    }
+  },
+  "only_detected": true,
+  "rows": 85595,
+  "rows_evaluated": 64848,
+  "split": "val"
+}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 10180.24it/s]
+{
+  "checkpoint": "outputs/models/dinov2_climate_masked/best.pt",
+  "image_mode": "masked",
+  "metrics": {
+    "loss": 0.7797635051164691,
+    "mean_mae": 14.718248224258422,
+    "mean_r2": 0.24221688646083778,
+    "per_target": {
+      "diurnal_range_c": {
+        "mae": 3.65848445892334,
+        "mse": 20.389049530029297,
+        "pearson_r": 0.40501387244181913,
+        "r2": 0.15756887299061206
+      },
+      "solar_wm2": {
+        "mae": 59.21110534667969,
+        "mse": 5369.14453125,
+        "pearson_r": 0.4791090853230295,
+        "r2": 0.22483300943787532
+      },
+      "temperature_2m_mean": {
+        "mae": 5.439133644104004,
+        "mse": 49.22950744628906,
+        "pearson_r": 0.5694941390917855,
+        "r2": 0.3176835134767463
+      },
+      "vpd_kpa": {
+        "mae": 0.42139124870300293,
+        "mse": 0.35515379905700684,
+        "pearson_r": 0.42769029927693203,
+        "r2": 0.17223936679592833
+      },
+      "wbt_c": {
+        "mae": 4.86112642288208,
+        "mse": 39.29003143310547,
+        "pearson_r": 0.5844311035910267,
+        "r2": 0.33875966960302695
+      }
+    }
+  },
+  "only_detected": true,
+  "rows": 85595,
+  "rows_evaluated": 64848,
+  "split": "val"
+}
