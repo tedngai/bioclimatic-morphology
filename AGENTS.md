@@ -22,7 +22,7 @@ Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species
 
 **Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`.
 
-**Variant runs + controls complete (2026-10-05).** `crop`, `masked`, and the `bg` background-only control each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** / bg **0.3921** / crop **0.3661** / masked **0.2749**; on the detected-only subset (no fallback, 64,848 rows): full **0.4241** / bg **0.3901** / crop **0.3583** / masked **0.2422**. Background alone keeps ~92–94% of the full-frame signal, animal alone ~57–66% → the photos' climate signal is dominated by habitat/background, with a genuine but secondary morphology component. **Scale-up running (2026-10-09):** ViT-L/14 @ 336, 5 epochs, tmux `dinov2-large336` (~18 h). Details in Training Status.
+**Variant runs + controls complete (2026-10-05).** `crop`, `masked`, and the `bg` background-only control each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** / bg **0.3921** / crop **0.3661** / masked **0.2749**; on the detected-only subset (no fallback, 64,848 rows): full **0.4241** / bg **0.3901** / crop **0.3583** / masked **0.2422**. Background alone keeps ~92–94% of the full-frame signal, animal alone ~57–66% → the photos' climate signal is dominated by habitat/background, with a genuine but secondary morphology component. **Scale-up paused (2026-10-10):** ViT-L/14 @ 336, 2/5 epochs done, best 0.4347 (ep 2) — resume command in the order of operations. Details in Training Status.
 
 ## What's Done
 
@@ -95,6 +95,15 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 - All 5 targets are learned positively (R² > 0.30) on unseen species → genuine cross-species climate signal.
 - Caveat: the full-frame model mostly reads the **environment** (habitat, vegetation, sky) — hence the morphology test.
 
+### Scale-up run — ViT-L/14 @ 336 (paused 2026-10-10)
+
+| Epoch | val mean R² | wbt | temp | solar | vpd | diurnal |
+|---|---|---|---|---|---|---|
+| 1 | 0.4182 | .556 | .544 | .364 | .333 | .294 |
+| 2 | **0.4347** (best) | .572 | .562 | .383 | .356 | .300 |
+
+Paused at 2/5 epochs to free the GPU for the LLM server; `best.pt`/`last.pt` = epoch 2, `history.csv` has both rows. Resume command in Assessment → Order of operations item 6.
+
 ### Variant results — morphology test (2026-10-02, controls 2026-10-05)
 
 Same species-disjoint split and hparams as `dinov2_climate_bs128w8_backbone2e6`. `crop` = bbox around the animal (10% pad); `masked` = non-animal pixels to neutral gray 128 (animal-only); `bg` = animal pixels to neutral gray (background-only). Rows without a SAM 3 detection (23.3%) fall back to the full frame — `detection_coverage` is 0.768 train / 0.758 val — which dilutes variant differences; the detected-only re-eval (`evaluate.py --only-detected`, 64,848 val rows) removes that dilution.
@@ -134,7 +143,15 @@ Per-target val R² at each run's best epoch (all rows):
 3. ~~Segmentation~~ — **done 2026-10-01**: 970,147 images, 76.7% detections, 55 h. Manifest deduplicated to one row per observation (resumability fixed via `astype(str)` on ids).
 4. ~~Retrain on variants~~ — **done 2026-10-02**: crop **0.3661** / masked **0.2749** vs. full-frame **0.4184**. Neither collapsed → morphology signal is real, but the background/habitat carries a large share (caveat: 23.3% no-detection rows fall back to full frame). See variant results table.
 5. ~~Controls~~ — **done 2026-10-04/05**: detected-only re-eval (masked 0.2422 vs full 0.4241 on matched rows) + `bg` background-only run (0.3921; ~94% of full-frame). Verdict: environment/habitat dominates the signal; morphology is real but secondary.
-6. **Scale-up running (launched 2026-10-09):** ViT-L/14 @ 336, bs 128, 5 epochs (early-stopping budget, ~18 h), tmux `dinov2-large336`, based on the 2026-10-09 benchmark. Evals are chained after training. The silhouette (shape-only) control remains available if we want the morphology story airtight first.
+6. **Scale-up PAUSED (2026-10-10, LLM in use):** ViT-L/14 @ 336, bs 128 — **2/5 epochs complete, best val mean R² 0.4347** (ep 2, already above the 0.4184 ViT-B baseline; ep 1 was 0.4182). Stopped mid-epoch-3 to free the GPU for the LLM server; both checkpoints intact (`best.pt`/`last.pt` = epoch 2). Resume when the LLM is free:
+   ```bash
+   bm-venv/bin/python scripts/training/train_dinov2.py \
+     --model-name facebook/dinov2-large --image-size 336 --batch-size 128 --num-workers 8 \
+     --backbone-lr 2e-6 --head-lr 1e-4 --epochs 5 \
+     --output-dir outputs/models/dinov2_climate_large336 \
+     --resume-checkpoint outputs/models/dinov2_climate_large336/last.pt
+   ```
+   Then `evaluate.py` on `best.pt` (all-rows + `--only-detected`). ~3 epochs remain (~12 h). Silhouette (shape-only) control still available.
 
 ### Ceiling-raising levers (claim-independent)
 Resolution (224 → 518), capacity (ViT-B → ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
