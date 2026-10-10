@@ -1,0 +1,42 @@
+=== facebook/dinov2-large size=518 bs=128 ===
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/439 [00:00<?, ?it/s]Loading weights: 100%|██████████| 439/439 [00:00<00:00, 12962.42it/s]
+train profile | steps=10 | end_to_end_img/s=26.9 | gpu_only_img/s=26.9 | wait=0.1 ms | h2d=7.8 ms | fwd=3389.3 ms | bwd=1335.1 ms | opt=22.2 ms | gpu_active=100.0% | loader_wait=0.0%
+train profile memory | peak_cuda_allocated=34.90 GiB
+saved profile to outputs/profiles/scaleup_dinov2-large_518_bs128.json
+               total        used        free      shared  buff/cache   available
+Mem:             121          40          52           0          29          81
+=== facebook/dinov2-large size=518 bs=64 ===
+Loading weights:   0%|          | 0/439 [00:00<?, ?it/s]Loading weights: 100%|██████████| 439/439 [00:00<00:00, 4460.83it/s]
+train profile | steps=10 | end_to_end_img/s=27.4 | gpu_only_img/s=27.4 | wait=0.1 ms | h2d=3.9 ms | fwd=1678.9 ms | bwd=629.3 ms | opt=21.9 ms | gpu_active=100.0% | loader_wait=0.0%
+train profile memory | peak_cuda_allocated=18.30 GiB
+saved profile to outputs/profiles/scaleup_dinov2-large_518_bs64.json
+               total        used        free      shared  buff/cache   available
+Mem:             121          40          50           0          31          80
+=== facebook/dinov2-large size=336 bs=128 ===
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/439 [00:00<?, ?it/s]Loading weights: 100%|██████████| 439/439 [00:00<00:00, 10264.74it/s]
+train profile | steps=10 | end_to_end_img/s=66.9 | gpu_only_img/s=66.9 | wait=0.1 ms | h2d=3.4 ms | fwd=1367.6 ms | bwd=520.1 ms | opt=22.2 ms | gpu_active=100.0% | loader_wait=0.0%
+train profile memory | peak_cuda_allocated=15.67 GiB
+saved profile to outputs/profiles/scaleup_dinov2-large_336_bs128.json
+               total        used        free      shared  buff/cache   available
+Mem:             121          40          50           0          31          80
+=== facebook/dinov2-large size=224 bs=128 ===
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/439 [00:00<?, ?it/s]Loading weights: 100%|██████████| 439/439 [00:00<00:00, 6278.13it/s]
+train profile | steps=10 | end_to_end_img/s=145.8 | gpu_only_img/s=145.8 | wait=0.1 ms | h2d=1.5 ms | fwd=622.0 ms | bwd=232.1 ms | opt=22.0 ms | gpu_active=100.0% | loader_wait=0.0%
+train profile memory | peak_cuda_allocated=7.91 GiB
+saved profile to outputs/profiles/scaleup_dinov2-large_224_bs128.json
+               total        used        free      shared  buff/cache   available
+Mem:             121          40          50           0          31          81
+=== facebook/dinov2-base size=518 bs=128 ===
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/223 [00:00<?, ?it/s]Loading weights: 100%|██████████| 223/223 [00:00<00:00, 4792.61it/s]
+train profile | steps=10 | end_to_end_img/s=60.7 | gpu_only_img/s=60.7 | wait=0.1 ms | h2d=7.7 ms | fwd=1197.8 ms | bwd=890.6 ms | opt=12.6 ms | gpu_active=100.0% | loader_wait=0.0%
+train profile memory | peak_cuda_allocated=25.67 GiB
+saved profile to outputs/profiles/scaleup_dinov2-base_518_bs128.json
+               total        used        free      shared  buff/cache   available
+Mem:             121          41          49           0          32          80
+ALL DONE
+               total        used        free      shared  buff/cache   available
+Mem:             121          41          49           0          32          80

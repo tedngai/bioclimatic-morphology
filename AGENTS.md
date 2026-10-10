@@ -137,7 +137,22 @@ Per-target val R² at each run's best epoch (all rows):
 6. **Next decision:** (a) commit to the environment claim and scale up — image_size 224 → 518, ViT-B → ViT-L/14, early stopping; or (b) add the silhouette (shape-only) morphology control before scaling.
 
 ### Ceiling-raising levers (claim-independent)
-Resolution (224 vs. DINOv2 native 518), capacity (ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
+Resolution (224 → 518), capacity (ViT-B → ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
+
+**Scale-up benchmark (2026-10-09, with the LLM server holding ~34 GiB).** `profile_dinov2.py --mode train` (bs 128 unless noted, 8 workers, 5 warmup + 10 profile steps; GPU 100% active, loader wait 0%). Epoch = 884,323 train images.
+
+| Model | image_size | batch | img/s | peak CUDA alloc | epoch ETA | 5-epoch ETA |
+|---|---|---|---|---|---|---|
+| ViT-B/14 (baseline config) | 224 | 128 | ~329 | 5.4 GiB | ~0.75 h | ~3.7 h |
+| ViT-B/14 | 518 | 128 | 60.7 | 25.7 GiB | ~4.0 h | ~20 h |
+| ViT-L/14 | 224 | 128 | 145.8 | 7.9 GiB | ~1.7 h | ~8.4 h |
+| ViT-L/14 | 336 | 128 | 66.9 | 15.7 GiB | ~3.7 h | ~18 h |
+| ViT-L/14 | 518 | 128 | 26.9 | 34.9 GiB | ~9.1 h | ~46 h |
+| ViT-L/14 | 518 | 64 | 27.4 | 18.3 GiB | ~9.0 h | ~45 h |
+
+- Memory is not the constraint: the heaviest config peaked at 34.9 GiB alongside the LLM's ~34 GiB; the system stayed ≥38 GiB available throughout. No OOM; the LLM does **not** need stopping for memory (only if it starts serving heavy traffic and bandwidth contention shows up, or for the unmeasured throughput headroom).
+- Throughput is the constraint: ViT-L/14 @ 518 is ~9 h/epoch (~2 days for a 5-epoch run); ViT-L/14 @ 336 ~3.7 h/epoch; ViT-B/14 @ 518 ~4 h/epoch.
+- All existing runs plateaued by epoch 4–6, so early stopping ≈5 epochs is sensible.
 
 ## SAM 3 Segmentation Pipeline
 
