@@ -22,7 +22,7 @@ Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species
 
 **Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`.
 
-**Variant runs complete (2026-10-02); controls in progress (2026-10-04).** `crop` and `masked` each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** → crop **0.3661** → masked **0.2749**; on the detected-only subset (no fallback) full **0.4241** / crop **0.3583** / masked **0.2422**. Animal-only morphology keeps a real signal (all 5 targets positive), but background/habitat carries the larger share. A background-only (`bg`) control run is running in tmux `dinov2-controls` to complete the 2×2 animal/background ablation. Details in Training Status.
+**Variant runs + controls complete (2026-10-05).** `crop`, `masked`, and the `bg` background-only control each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** / bg **0.3921** / crop **0.3661** / masked **0.2749**; on the detected-only subset (no fallback, 64,848 rows): full **0.4241** / bg **0.3901** / crop **0.3583** / masked **0.2422**. Background alone keeps ~92–94% of the full-frame signal, animal alone ~57–66% → the photos' climate signal is dominated by habitat/background, with a genuine but secondary morphology component. Details in Training Status; next: choose claim / scale-up vs. silhouette control.
 
 ## What's Done
 
@@ -95,44 +95,46 @@ Two runs, DINOv2 ViT-B/14, bs=128, nw=8, 10 epochs, species-disjoint split (10,7
 - All 5 targets are learned positively (R² > 0.30) on unseen species → genuine cross-species climate signal.
 - Caveat: the full-frame model mostly reads the **environment** (habitat, vegetation, sky) — hence the morphology test.
 
-### Variant results — morphology test (2026-10-02, 10 epochs each)
+### Variant results — morphology test (2026-10-02, controls 2026-10-05)
 
-Same species-disjoint split and hparams as `dinov2_climate_bs128w8_backbone2e6`. `crop` = bbox around the animal (10% pad); `masked` = non-animal pixels set to neutral gray (128). Rows without a SAM 3 detection (23.3%) fall back to the full frame — `detection_coverage` is 0.768 train / 0.758 val in both `run_config.json`s, which dilutes the variant differences.
+Same species-disjoint split and hparams as `dinov2_climate_bs128w8_backbone2e6`. `crop` = bbox around the animal (10% pad); `masked` = non-animal pixels to neutral gray 128 (animal-only); `bg` = animal pixels to neutral gray (background-only). Rows without a SAM 3 detection (23.3%) fall back to the full frame — `detection_coverage` is 0.768 train / 0.758 val — which dilutes variant differences; the detected-only re-eval (`evaluate.py --only-detected`, 64,848 val rows) removes that dilution.
 
-| Run | image mode | Best val mean R² | Best epoch | Final epoch |
+| Run | image content | Best val mean R² | Best epoch | Final epoch | Detected-only mean R² |
+|---|---|---|---|---|---|
+| `dinov2_climate_bs128w8_backbone2e6` | animal + background | 0.4184 | 5 | 0.4155 | **0.4241** |
+| `dinov2_climate_bg` | background only | 0.3921 | 5 | 0.3890 | **0.3901** |
+| `dinov2_climate_crop` | cropped context | 0.3661 | 4 | 0.3573 | **0.3583** |
+| `dinov2_climate_masked` | animal only | 0.2749 | 6 | 0.2705 | **0.2422** |
+
+Per-target val R² at each run's best epoch (all rows):
+
+| Target | full | bg | crop | masked |
 |---|---|---|---|---|
-| `dinov2_climate_bs128w8_backbone2e6` | full | 0.4184 | 5 | 0.4155 |
-| `dinov2_climate_crop` | crop | 0.3661 | 4 | 0.3573 |
-| `dinov2_climate_masked` | masked | 0.2749 | 6 | 0.2705 |
+| wbt_c | 0.552 | 0.517 | 0.488 | 0.384 |
+| temperature_2m_mean | 0.537 | 0.501 | 0.471 | 0.362 |
+| solar_wm2 | 0.366 | 0.329 | 0.324 | 0.242 |
+| vpd_kpa | 0.335 | 0.314 | 0.287 | 0.197 |
+| diurnal_range_c | 0.303 | 0.300 | 0.260 | 0.189 |
+| **mean** | **0.4184** | **0.3921** | **0.3661** | **0.2749** |
 
-Per-target val R² at each run's best epoch:
-
-| Target | full-frame | crop | masked |
-|---|---|---|---|
-| wbt_c | 0.552 | 0.488 | 0.384 |
-| temperature_2m_mean | 0.537 | 0.471 | 0.362 |
-| solar_wm2 | 0.366 | 0.324 | 0.242 |
-| vpd_kpa | 0.335 | 0.287 | 0.197 |
-| diurnal_range_c | 0.303 | 0.260 | 0.189 |
-| **mean** | **0.4184** | **0.3661** | **0.2749** |
-
-- All five targets stay clearly positive with the animal isolated → morphology carries a genuine cross-species climate signal.
-- Removing the background costs −34% mean R² on all rows (masked 0.2749 vs. full 0.4184); crop is intermediate. The full-frame model reads a large part of its signal from habitat/background.
-- **Detected-only re-eval (2026-10-04, `--only-detected`, 64,848 val rows — no full-frame fallback):** mean R² full **0.4241** / crop **0.3583** / masked **0.2422**. The fallback rows had been inflating masked (0.2749 → 0.2422), so on identical rows animal-only morphology retains ~57% of the full-frame signal (masked per-target: wbt 0.339, temp 0.318, solar 0.225, vpd 0.172, diurnal 0.158).
-- History: `outputs/models/dinov2_climate_{crop,masked}/history.csv` (tracked). Checkpoints `best.pt` (~550 MB) live only on the server. Formal eval JSONs via `evaluate.py` (see image-variants section).
+- **Background dominance:** background-only retains 94% of the full-frame mean R² (all rows) / 92% (detected-only); animal-only retains 66% / 57%. The climate signal in wildlife photos is carried mostly by habitat/background; animal morphology contributes a genuine but secondary component.
+- All five targets remain clearly positive with the animal isolated (detected-only masked: wbt 0.339, temp 0.318, solar 0.225, vpd 0.172, diurnal 0.158) → the morphology claim survives, at reduced strength.
+- The 23.3% no-detection fallback rows inflate the masked headline (0.2749 → 0.2422 on matched rows) and slightly deflate full-frame (0.4184 → 0.4241).
+- History: `outputs/models/dinov2_climate_{bg,crop,masked}/history.csv` (tracked). Checkpoints `best.pt` (~550 MB) live only on the server. Eval JSONs via `evaluate.py` (see image-variants section).
 
 ## Assessment & Plan
 
 ### The scientific fork
 1. **Environment-from-photos** (current full-frame setup): "climate is readable from wildlife photos." Strong, publishable; R²≈0.42 is a floor.
-2. **Morphology** (project namesake, being tested now): "the climate signal lives in the animal body." Requires background removal via segmentation/cropping and a same-split comparison.
+2. **Morphology** (project namesake, tested 2026-10-01/05): "the climate signal lives in the animal body." Animal-only retains ~57–66% of the full-frame signal on matched rows — real but secondary; background dominates.
 
 ### Order of operations
 1. ~~Per-target eval~~ — done 2026-06-21.
 2. ~~Decide claim~~ — decided: run the morphology test.
 3. ~~Segmentation~~ — **done 2026-10-01**: 970,147 images, 76.7% detections, 55 h. Manifest deduplicated to one row per observation (resumability fixed via `astype(str)` on ids).
 4. ~~Retrain on variants~~ — **done 2026-10-02**: crop **0.3661** / masked **0.2749** vs. full-frame **0.4184**. Neither collapsed → morphology signal is real, but the background/habitat carries a large share (caveat: 23.3% no-detection rows fall back to full frame). See variant results table.
-5. **Controls (in progress 2026-10-04):** detected-only re-eval done (masked 0.2422 vs full 0.4241 on identical rows); `bg` background-only run running (~8 h). Next after that: optional silhouette (shape-only) control, then choose claim / scale up (518 px, ViT-L/14).
+5. ~~Controls~~ — **done 2026-10-04/05**: detected-only re-eval (masked 0.2422 vs full 0.4241 on matched rows) + `bg` background-only run (0.3921; ~94% of full-frame). Verdict: environment/habitat dominates the signal; morphology is real but secondary.
+6. **Next decision:** (a) commit to the environment claim and scale up — image_size 224 → 518, ViT-B → ViT-L/14, early stopping; or (b) add the silhouette (shape-only) morphology control before scaling.
 
 ### Ceiling-raising levers (claim-independent)
 Resolution (224 vs. DINOv2 native 518), capacity (ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
@@ -181,7 +183,7 @@ Masks (~3 GB) land in `data/vision/segmented/masks/{taxon}/{obs_id}.png`.
   - `bg` — animal pixels set to neutral gray (128), background kept (background-only control).
   - Rows without a detection (23.3% of the dataset) or with a missing mask fall back to the full frame; `detection_coverage` is recorded in each run's `run_config.json`. `evaluate.py --only-detected` filters to rows with usable detections (no fallback) for dilution-free comparisons.
 - Variant runs complete (2026-10-01/02, tmux `dinov2-variants`): `outputs/models/dinov2_climate_crop` (best ep 4, 0.3661), then `outputs/models/dinov2_climate_masked` (best ep 6, 0.2749); ~8 h each.
-- Background-only control running (2026-10-04, tmux `dinov2-controls`): `outputs/models/dinov2_climate_bg` (same hparams).
+- Background-only control complete (2026-10-04/05, tmux `dinov2-controls`): `outputs/models/dinov2_climate_bg` (best ep 5, 0.3921; detected-only 0.3901). Followed by `evaluate.py` on both splits → `eval_val.json` + `eval_val_detected.json`.
 - Train command:
   ```bash
   bm-venv/bin/python scripts/training/train_dinov2.py --image-mode bg \
