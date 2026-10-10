@@ -22,7 +22,7 @@ Baseline DINOv2 climate training is **complete** (val mean R² ≈ 0.42, species
 
 **Segmentation complete (2026-10-01).** The grad-mode + mask-shape bugs and the stale `sam3` install are fixed, and the full run finished: **970,147 images → 744,528 detections (76.7%) in 55 h at 4.9 img/s** (mammals 73.6%, birds 80.0%; only 2 truncated images failed). Masks (~2.9 GB, 744,528 PNGs) are in `data/vision/segmented/masks/{taxon}/`.
 
-**Variant runs + controls complete (2026-10-05).** `crop`, `masked`, and the `bg` background-only control each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** / bg **0.3921** / crop **0.3661** / masked **0.2749**; on the detected-only subset (no fallback, 64,848 rows): full **0.4241** / bg **0.3901** / crop **0.3583** / masked **0.2422**. Background alone keeps ~92–94% of the full-frame signal, animal alone ~57–66% → the photos' climate signal is dominated by habitat/background, with a genuine but secondary morphology component. Details in Training Status; next: choose claim / scale-up vs. silhouette control.
+**Variant runs + controls complete (2026-10-05).** `crop`, `masked`, and the `bg` background-only control each trained 10 epochs with the best-baseline hparams. Best val mean R²: full **0.4184** / bg **0.3921** / crop **0.3661** / masked **0.2749**; on the detected-only subset (no fallback, 64,848 rows): full **0.4241** / bg **0.3901** / crop **0.3583** / masked **0.2422**. Background alone keeps ~92–94% of the full-frame signal, animal alone ~57–66% → the photos' climate signal is dominated by habitat/background, with a genuine but secondary morphology component. **Scale-up running (2026-10-09):** ViT-L/14 @ 336, 5 epochs, tmux `dinov2-large336` (~18 h). Details in Training Status.
 
 ## What's Done
 
@@ -134,7 +134,7 @@ Per-target val R² at each run's best epoch (all rows):
 3. ~~Segmentation~~ — **done 2026-10-01**: 970,147 images, 76.7% detections, 55 h. Manifest deduplicated to one row per observation (resumability fixed via `astype(str)` on ids).
 4. ~~Retrain on variants~~ — **done 2026-10-02**: crop **0.3661** / masked **0.2749** vs. full-frame **0.4184**. Neither collapsed → morphology signal is real, but the background/habitat carries a large share (caveat: 23.3% no-detection rows fall back to full frame). See variant results table.
 5. ~~Controls~~ — **done 2026-10-04/05**: detected-only re-eval (masked 0.2422 vs full 0.4241 on matched rows) + `bg` background-only run (0.3921; ~94% of full-frame). Verdict: environment/habitat dominates the signal; morphology is real but secondary.
-6. **Next decision:** (a) commit to the environment claim and scale up — image_size 224 → 518, ViT-B → ViT-L/14, early stopping; or (b) add the silhouette (shape-only) morphology control before scaling.
+6. **Scale-up running (launched 2026-10-09):** ViT-L/14 @ 336, bs 128, 5 epochs (early-stopping budget, ~18 h), tmux `dinov2-large336`, based on the 2026-10-09 benchmark. Evals are chained after training. The silhouette (shape-only) control remains available if we want the morphology story airtight first.
 
 ### Ceiling-raising levers (claim-independent)
 Resolution (224 → 518), capacity (ViT-B → ViT-L/14), regularization (dropout/weight decay), early stopping ~ep 5.
